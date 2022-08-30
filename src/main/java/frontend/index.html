@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Webpage</title>
+</head>
+<body>
+    <table>
+        <tr>
+            <th>Symbol</th>
+            <th>Cost</th>
+            <th>Change</th>
+            <th>Percent Change</th>
+            <th>High</th>
+            <th>Low</th>
+            <th>Open</th>
+            <th>Previous Close</th>
+        </tr>
+        <tr>
+            <th id="symbol">Symbol</th>
+            <th id="cost">Cost</th>
+            <th id="change">Change</th>
+            <th id="percent-change">Percent Change</th>
+            <th id="high">High</th>
+            <th id="low">Low</th>
+            <th id="open">Open</th>
+            <th id="close">Previous Close</th>
+        </tr>
+    </table>
+    <label for="symbol-input">Symbol:</label><input id="symbol-input" maxlength="8" placeholder="BTC-USD"/>
+    <button onclick="updateStockDisplay(document.getElementById('symbol-input').value.toUpperCase())">Update display</button>
+</body>
+<style>
+    table {
+        border: 2px solid black;
+    }
+    th {
+        border: 1px solid black;
+    }
+    #change {
+
+    }
+</style>
+<script>
+    function updateStockDisplay(symbol) {
+        let Http = new XMLHttpRequest();
+        let url = "http://localhost:8080/users/quote?symbol=" + symbol
+        Http.open("GET", url);
+        Http.send();
+
+        Http.onreadystatechange = (e) => {
+            if (Http.status === 200) {
+                let data = JSON.parse(Http.responseText);
+                console.log(data);
+                if (data.cost != null) {
+                    document.getElementById("symbol").textContent = data.symbol.toString();
+                    document.getElementById("cost").textContent = "$" + data.cost.toString();
+                    document.getElementById("change").textContent = "$" + data.change.toString();
+                    document.getElementById("percent-change").textContent = +data.percentChange.toString() + "%";
+                    document.getElementById("high").textContent = "$" + data.high.toString();
+                    document.getElementById("low").textContent = "$" + data.low.toString();
+                    document.getElementById("open").textContent = "$" + data.dayOpen.toString();
+                    document.getElementById("close").textContent = "$" + data.previousClose.toString();
+                }
+            }
+        }
+    }
+</script>
+</html>
