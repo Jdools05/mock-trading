@@ -1,5 +1,6 @@
 package database.daos;
 
+import database.entities.StockEntity;
 import database.entities.TransactionHistoryEntity;
 import enums.TradeType;
 
@@ -11,11 +12,10 @@ import java.time.LocalDateTime;
 public class TransactionHistoryDao {
 
     @Transactional
-    public TransactionHistoryEntity create(String symbol, double amount, double price, TradeType tradeType) {
+    public TransactionHistoryEntity create(StockEntity stock, double price, TradeType tradeType) {
         TransactionHistoryEntity entity = new TransactionHistoryEntity();
         entity.timestamp = LocalDateTime.now();
-        entity.symbol = symbol;
-        entity.amount = amount;
+        entity.stock = stock;
         entity.price = price;
         entity.tradeType = tradeType;
         entity.persist();

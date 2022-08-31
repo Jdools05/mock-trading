@@ -44,7 +44,7 @@
 <script>
     function updateStockDisplay(symbol) {
         let Http = new XMLHttpRequest();
-        let url = "http://localhost:8080/users/quote?symbol=" + symbol
+        let url = "https://mock-trading-dev.jordan-dooley.celestialdata.net/users/quote?symbol=" + symbol
         Http.open("GET", url);
         Http.send();
 

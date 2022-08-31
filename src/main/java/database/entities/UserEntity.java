@@ -38,7 +38,7 @@ public class UserEntity extends PanacheEntity {
 
     @Column(name = "stocks")
     @OneToMany
-    public List<Stock> stocks;
+    public List<StockEntity> stocks;
 
     @Column(name = "transaction_history")
     @OneToMany

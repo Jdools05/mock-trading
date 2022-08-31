@@ -3,9 +3,11 @@ package database.entities;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Entity
-public class Stock extends PanacheEntity {
+@Table(name = "stock_entity_table")
+public class StockEntity extends PanacheEntity {
 
     public String symbol;
     public double amount;

@@ -2,8 +2,10 @@ package apis;
 
 import clients.models.finnhub.FinnhubQuote;
 import clients.services.FinancialResourceClient;
+import database.daos.StockEntityDao;
 import database.daos.TransactionHistoryDao;
 import database.daos.UserEntityDao;
+import database.entities.StockEntity;
 import database.entities.TransactionHistoryEntity;
 import database.entities.UserEntity;
 import enums.TradeType;
@@ -37,6 +39,9 @@ public class UserResource {
 
     @Inject
     TransactionHistoryDao transactionHistoryDao;
+
+    @Inject
+    StockEntityDao stockEntityDao;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -77,12 +82,15 @@ public class UserResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
     public UserEntity appendTransaction(@Context SecurityContext securityContext, @NotNull @QueryParam("symbol") String symbol, @NotNull @QueryParam("amount") double amount, @NotNull @QueryParam("pricePU") double price, @NotNull @QueryParam("tradeType") TradeType tradeType) {
-        TransactionHistoryEntity transactionEntity = transactionHistoryDao.create(symbol, amount, price, tradeType);
+        StockEntity stockEntity = stockEntityDao.create(symbol, amount);
         UserEntity userEntity = userEntityDao.findByUsername(securityContext.getUserPrincipal().getName());
+        List<StockEntity> userInv = userEntity.stocks;
         if (tradeType == TradeType.BUY && userEntity.cash < amount * price) {
-            transactionEntity.delete();
             throw new WebApplicationException(Response.status(400).build());
+        } else if (tradeType == TradeType.SELL) {
+
         }
+        TransactionHistoryEntity transactionEntity = transactionHistoryDao.create(stockEntity, price, tradeType);
         userEntity = userEntityDao.appendTransaction(userEntity, transactionEntity);
         return userEntity;
     }
