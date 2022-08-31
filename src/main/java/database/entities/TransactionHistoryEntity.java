@@ -3,10 +3,7 @@ package database.entities;
 import enums.TradeType;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,6 +15,7 @@ public class TransactionHistoryEntity extends PanacheEntity {
     public LocalDateTime timestamp;
 
     @Column(name = "stock")
+    @OneToOne
     public StockEntity stock;
 
     @Column(name = "price")
