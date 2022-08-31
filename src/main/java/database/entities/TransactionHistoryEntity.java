@@ -5,7 +5,6 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "transaction_history_entity_table")
@@ -14,7 +13,7 @@ public class TransactionHistoryEntity extends PanacheEntity {
     @Column(name = "timestamp")
     public LocalDateTime timestamp;
 
-    @Column(name = "stock")
+    @JoinColumn(name = "stock")
     @OneToOne
     public StockEntity stock;
 
