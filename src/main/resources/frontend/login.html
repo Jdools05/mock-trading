@@ -5,6 +5,52 @@
     <title>Login</title>
 </head>
 <body>
-
+<div style="text-align: center;">
+    <h3>Student Login</h3>
+</div>
+<form>
+    <div class="container">
+        <label>Username : </label>
+        <input type="text" placeholder="Enter Username" name="username" required>
+        <label>Password : </label>
+        <input type="password" placeholder="Enter Password" name="password" required>
+        <button type="submit" onclick="logUserIn()">Login</button>
+    </div>
+</form>
 </body>
+<script>
+    const apiEndpoint = "https://mock-trading-dev.jordan-dooley.celestialdata.net/";
+
+    function logUserIn() {
+        const loginForm = document.forms[0];
+        const username = loginForm.elements["username"].value;
+        const password = loginForm.elements["password"].value;
+
+        const secret = username + ":" + password;
+        setCookie("token", btoa(secret), 0.75);
+    }
+
+    function setCookie(cname, cvalue, exdays) {
+        const d = new Date();
+        d.setTime(d.getTime() + (exdays*24*60*60*1000));
+        let expires = "expires="+ d.toUTCString();
+        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    }
+
+    function getCookie(cname) {
+        let name = cname + "=";
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let ca = decodedCookie.split(';');
+        for(let i = 0; i <ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) === ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) === 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    }
+</script>
 </html>

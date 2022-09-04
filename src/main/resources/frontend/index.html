@@ -42,10 +42,15 @@
     }
 </style>
 <script>
+    function getUserToken() {
+        return getCookie("token");
+    }
+
     function updateStockDisplay(symbol) {
         let Http = new XMLHttpRequest();
-        let url = "https://mock-trading-dev.jordan-dooley.celestialdata.net/users/quote?symbol=" + symbol
+        let url = "https://mock-trading-dev.jordan-dooley.celestialdata.net/api/v1/users/quote?symbol=" + symbol
         Http.open("GET", url);
+        Http.setRequestHeader("Authorization", "Basic " + getUserToken());
         Http.send();
 
         Http.onreadystatechange = (e) => {
@@ -65,5 +70,49 @@
             }
         }
     }
+
+    function getCookie(cname) {
+        let name = cname + "=";
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let ca = decodedCookie.split(';');
+        for(let i = 0; i <ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) === ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) === 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    }
+
+    async function validateUser() {
+        let Http = new XMLHttpRequest();
+        let url = "https://mock-trading-dev.jordan-dooley.celestialdata.net/api/v1/users/validate";
+        Http.open("GET", url);
+        Http.setRequestHeader("Authorization", "Basic " + getUserToken())
+        Http.send();
+
+        Http.onreadystatechange = (e) => {
+            if (Http.status === 401 || Http.status === 403 || Http.status === 500) {
+                console.log("Rejected user!");
+                return false;
+            }
+            if (Http.status === 200) {
+                console.log("Accepted user!");
+                return true;
+            }
+        }
+    }
+
+    async function checkUser() {
+        const token = getCookie("token");
+        if (token === "" || !await validateUser()) {
+            window.location.replace("https://mock-trading-dev.jordan-dooley.celestialdata.net/login");
+        }
+    }
+
+    window.onload = checkUser;
 </script>
 </html>
