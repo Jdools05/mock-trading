@@ -43,4 +43,8 @@ public class UserEntityDao {
     public UserEntity findByUsername(String username) {
         return UserEntity.find("username", username).firstResult();
     }
+
+    public UserEntity findByEmail(String email) {
+        return UserEntity.find("email", email).firstResult();
+    }
 }

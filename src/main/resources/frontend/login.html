@@ -6,7 +6,7 @@
 </head>
 <body>
 <div style="text-align: center;">
-    <h3>Student Login</h3>
+    <h3>JHS Mock Trading Login</h3>
 </div>
 <form>
     <div class="container">
@@ -17,17 +17,74 @@
         <button type="submit" onclick="logUserIn()">Login</button>
     </div>
 </form>
+<h3 id="invalid-login-message" style="display: none; color: red">Invalid login credentials</h3>
 </body>
 <script>
     const apiEndpoint = "https://mock-trading-dev.jordan-dooley.celestialdata.net/";
 
-    function logUserIn() {
+    async function logUserIn() {
         const loginForm = document.forms[0];
         const username = loginForm.elements["username"].value;
         const password = loginForm.elements["password"].value;
 
         const secret = username + ":" + password;
-        setCookie("token", btoa(secret), 0.75);
+        setCookie("token", btoa(secret), 0.0833);
+
+        if (await validateUser()) {
+            window.location.replace("https://mock-trading-dev.jordan-dooley.celestialdata.net/" + await isAdminUser() ? "admin" : "home")
+        } else {
+            loginForm.elements["username"].value = "";
+            loginForm.elements["password"].value = "";
+            loginForm.elements["username"].style.color = "red";
+            loginForm.elements["password"].style.color = "red";
+            document.getElementById("invalid-login-message").style.display = "block"
+        }
+    }
+
+    function getUserToken() {
+        return getCookie("token");
+    }
+
+    async function validateUser() {
+        let Http = new XMLHttpRequest();
+        let url = "https://mock-trading-dev.jordan-dooley.celestialdata.net/api/v1/users/validate";
+        Http.open("GET", url);
+        Http.setRequestHeader("Authorization", "Basic " + getUserToken())
+        Http.send();
+
+        Http.onreadystatechange = (e) => {
+            if (Http.status === 401 || Http.status === 403 || Http.status === 500) {
+                console.log("Rejected user!");
+                return false;
+            }
+            if (Http.status === 200) {
+                console.log("Accepted user!");
+                return true;
+            }
+        }
+    }
+
+    function handleForm(event) { event.preventDefault(); }
+    document.forms[0].addEventListener('submit', handleForm);
+
+    async function isAdminUser() {
+        if (!await validateUser()) return false;
+        let Http = new XMLHttpRequest();
+        let url = "https://mock-trading-dev.jordan-dooley.celestialdata.net/api/v1/users/isAdmin";
+        Http.open("GET", url);
+        Http.setRequestHeader("Authorization", "Basic " + getUserToken())
+        Http.send();
+
+        Http.onreadystatechange = (e) => {
+            if (Http.status === 401 || Http.status === 403 || Http.status === 500) {
+                console.log("Rejected admin!");
+                return false;
+            }
+            if (Http.status === 200) {
+                console.log("Accepted admin!");
+                return true;
+            }
+        }
     }
 
     function setCookie(cname, cvalue, exdays) {
