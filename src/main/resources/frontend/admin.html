@@ -6,5 +6,69 @@
 </head>
 <body>
 
+<header>header area</header>
+<nav>
+    <ul id="user-list">
+
+    </ul>
+</nav>
+
+<footer>footer area</footer>
+
 </body>
+
+<script>
+
+    window.onload = populateUserList;
+
+    async function populateUserList() {
+        const listView = document.getElementById("user-list");
+        const data = await getUserList();
+        for (let i = 0; i < data.length; i++) {
+            let user = data[i];
+            let li = document.createElement("li");
+            li.appendChild(document.createTextNode(user.username));
+            listView.appendChild(li);
+        }
+    }
+
+    async function getUserList() {
+        let Http = new XMLHttpRequest();
+        let url = "https://mock-trading-dev.jordan-dooley.celestialdata.net/api/v1/users/list";
+        Http.open("GET", url);
+        Http.setRequestHeader("Authorization", "Basic " + getUserToken());
+        Http.send();
+
+        Http.onreadystatechange = (e) => {
+            if (Http.status === 200) {
+                return JSON.parse(Http.responseText);
+            }
+        }
+    }
+
+    function getUserToken() {
+        return getCookie("token");
+    }
+
+    function getCookie(cname) {
+        let name = cname + "=";
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let ca = decodedCookie.split(';');
+        for(let i = 0; i <ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) === ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) === 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    }
+
+    function getUserToken() {
+        return getCookie("token");
+    }
+
+</script>
 </html>
