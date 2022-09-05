@@ -61,7 +61,8 @@
     async function checkUser() {
         const token = getCookie("token");
         if (token === "" || !await validateUser()) {
-            window.location.replace("https://mock-trading-dev.jordan-dooley.celestialdata.net/login");
+            // window.location.replace("https://mock-trading-dev.jordan-dooley.celestialdata.net/login");
+            console.log("User is not logged in!");
         } else {
             await getUserList();
         }
