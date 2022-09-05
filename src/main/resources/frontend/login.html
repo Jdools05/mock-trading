@@ -8,107 +8,24 @@
 <div style="text-align: center;">
     <h3>JHS Mock Trading Login</h3>
 </div>
-<form onsubmit="return false;">
+<form action="j_security_check" method="post">
     <div class="container">
-        <label>Username : </label>
-        <input type="text" placeholder="Enter Username" name="username" required>
-        <label>Password : </label>
-        <input type="password" placeholder="Enter Password" name="password" required>
-        <button type="submit" onclick="logUserIn()">Login</button>
+        <label for="j_username"><b>Username</b></label>
+        <input type="text" placeholder="Enter Username" name="j_username" id="j_username" required>
+
+        <label for="j_password"><b>Password</b></label>
+        <input type="password" placeholder="Enter Password" name="j_password" id="j_password" required>
+
+        <button type="submit">Login</button>
+
     </div>
 </form>
-<h3 id="invalid-login-message" style="display: none; color: red">Invalid login credentials</h3>
+<button onclick="logout()">Logout</button>
 </body>
 <script>
-    const apiEndpoint = "https://mock-trading-dev.jordan-dooley.celestialdata.net/";
-
-    async function logUserIn() {
-        const loginForm = document.forms[0];
-        const username = loginForm.elements["username"].value;
-        const password = loginForm.elements["password"].value;
-
-        const secret = username + ":" + password;
-        setCookie("token", btoa(secret), 0.0833);
-
-        if (await validateUser()) {
-            window.location.replace("https://mock-trading-dev.jordan-dooley.celestialdata.net/" + await isAdminUser() ? "admin" : "home")
-        } else {
-            loginForm.elements["username"].value = "";
-            loginForm.elements["password"].value = "";
-            loginForm.elements["username"].style.color = "red";
-            loginForm.elements["password"].style.color = "red";
-            document.getElementById("invalid-login-message").style.display = "block"
-        }
-    }
-
-
-    function getUserToken() {
-        return getCookie("token");
-    }
-
-    async function validateUser() {
-        let Http = new XMLHttpRequest();
-        let url = "https://mock-trading-dev.jordan-dooley.celestialdata.net/api/v1/users/validate";
-        Http.open("GET", url);
-        Http.setRequestHeader("Authorization", "Basic " + getUserToken())
-        Http.send();
-
-        Http.onreadystatechange = (e) => {
-            if (Http.status === 401 || Http.status === 403 || Http.status === 500) {
-                console.log("Rejected user!");
-                return false;
-            }
-            if (Http.status === 200) {
-                console.log("Accepted user!");
-                return true;
-            }
-        }
-    }
-
-    function handleForm(event) { event.preventDefault(); }
-    document.forms[0].addEventListener('submit', handleForm);
-
-    async function isAdminUser() {
-        if (!await validateUser()) return false;
-        let Http = new XMLHttpRequest();
-        let url = "https://mock-trading-dev.jordan-dooley.celestialdata.net/api/v1/users/isAdmin";
-        Http.open("GET", url);
-        Http.setRequestHeader("Authorization", "Basic " + getUserToken())
-        Http.send();
-
-        Http.onreadystatechange = (e) => {
-            if (Http.status === 401 || Http.status === 403 || Http.status === 500) {
-                console.log("Rejected admin!");
-                return false;
-            }
-            if (Http.status === 200) {
-                console.log("Accepted admin!");
-                return true;
-            }
-        }
-    }
-
-    function setCookie(cname, cvalue, exdays) {
-        const d = new Date();
-        d.setTime(d.getTime() + (exdays*24*60*60*1000));
-        let expires = "expires="+ d.toUTCString();
-        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-    }
-
-    function getCookie(cname) {
-        let name = cname + "=";
-        let decodedCookie = decodeURIComponent(document.cookie);
-        let ca = decodedCookie.split(';');
-        for(let i = 0; i <ca.length; i++) {
-            let c = ca[i];
-            while (c.charAt(0) === ' ') {
-                c = c.substring(1);
-            }
-            if (c.indexOf(name) === 0) {
-                return c.substring(name.length, c.length);
-            }
-        }
-        return "";
+    function logout() {
+        document.cookie = 'quarkus-credential=; Max-Age=0'
+        window.location.href = "/login";
     }
 </script>
 </html>

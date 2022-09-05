@@ -15,7 +15,7 @@ public class Startup {
 
     @Transactional
     public void addUsers(@Observes StartupEvent event) {
-        userEntityDao.create("admin", "user", "test@gmail.com", "password", "admin", 999999);
-        userEntityDao.create("test", "user", "tester@gmail.com", "password", "user", 9999);
+        userEntityDao.create("adminuser", "admin", "user", "test@gmail.com", "password", "admin", 999999);
+        userEntityDao.create("testuser", "test", "user", "tester@gmail.com", "password", "user", 9999);
     }
 }

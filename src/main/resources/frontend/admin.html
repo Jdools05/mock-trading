@@ -7,7 +7,11 @@
 <body>
 
 <h2>List of all users</h2>
-<button onclick="getUserList()">Refresh</button>
+<div id="buttons">
+    <button onclick="getUserList()">Refresh</button>
+    <button onclick="logout()">Logout</button>
+</div>
+
 <table id="user-list"></table>
 
 
@@ -53,18 +57,7 @@
             this.password = json.password;
             this.cash = json.cash;
             this.role = json.role;
-        }
-    }
-
-    window.onload = checkUser;
-
-    async function checkUser() {
-        const token = getCookie("token");
-        if (token === "" || !await validateUser()) {
-            // window.location.replace("https://mock-trading-dev.jordan-dooley.celestialdata.net/login");
-            console.log("User is not logged in!");
-        } else {
-            await getUserList();
+            this.transactions = json.transactions;
         }
     }
 
@@ -116,59 +109,24 @@
         }
     }
 
-    async function validateUser() {
-        let Http = new XMLHttpRequest();
-        let url = "https://mock-trading-dev.jordan-dooley.celestialdata.net/api/v1/users/validate";
-        Http.open("GET", url);
-        Http.setRequestHeader("Authorization", "Basic " + getUserToken())
-        Http.send();
-
-        Http.onreadystatechange = (e) => {
-            if (Http.status === 401 || Http.status === 403 || Http.status === 500) {
-                console.log("Rejected user!");
-                return false;
-            }
-            if (Http.status === 200) {
-                console.log("Accepted user!");
-                return true;
-            }
-        }
-    }
-
     async function getUserList() {
         let Http = new XMLHttpRequest();
-        let url = "https://mock-trading-dev.jordan-dooley.celestialdata.net/api/v1/users/list";
+        let url = window.location.origin + "/api/v1/users/list";
         Http.open("GET", url);
-        Http.setRequestHeader("Authorization", "Basic " + getUserToken());
         Http.send();
 
         Http.onreadystatechange = (e) => {
             console.log(Http.status);
             if (Http.status === 200) {
-                populateUserList(JSON.parse(Http.responseText));
                 console.log(Http.responseText);
+                populateUserList(JSON.parse(Http.responseText));
             }
         }
     }
 
-    function getUserToken() {
-        return getCookie("token");
-    }
-
-    function getCookie(cname) {
-        let name = cname + "=";
-        let decodedCookie = decodeURIComponent(document.cookie);
-        let ca = decodedCookie.split(';');
-        for(let i = 0; i <ca.length; i++) {
-            let c = ca[i];
-            while (c.charAt(0) === ' ') {
-                c = c.substring(1);
-            }
-            if (c.indexOf(name) === 0) {
-                return c.substring(name.length, c.length);
-            }
-        }
-        return "";
+    function logout() {
+        document.cookie = 'quarkus-credential=; Max-Age=0'
+        window.location.href = "/login";
     }
 
 </script>

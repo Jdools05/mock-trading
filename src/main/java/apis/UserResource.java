@@ -55,19 +55,6 @@ public class UserResource {
     }
 
     @GET
-    @Path("/validate")
-    public boolean validate(@Context SecurityContext context) {
-        return true;
-    }
-
-    @GET
-    @Path("/isAdmin")
-    @RolesAllowed("admin")
-    public boolean isAdmin(@Context SecurityContext context) {
-        return true;
-    }
-
-    @GET
     @Path("/quote")
     public FinnhubQuote quote(@Context SecurityContext context, @QueryParam("symbol") String symbol) throws ExecutionException, InterruptedException {
         FinnhubQuote quote = financialResourceClient.quote(symbol).toCompletableFuture().get();
@@ -80,11 +67,11 @@ public class UserResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
     @PermitAll
-    public UserEntity createUser(@NotNull @QueryParam("firstName") String firstName, @NotNull @QueryParam("lastName") String lastName, @NotNull @QueryParam("password") String password, @NotNull @QueryParam("email") String email, @NotNull @QueryParam("role") String role, @NotNull @QueryParam("cash") double cash) {
-        if (userEntityDao.findByUsername(firstName + lastName) != null || userEntityDao.findByEmail(email) != null) {
+    public UserEntity createUser(@NotNull @QueryParam("username") String username, @NotNull @QueryParam("firstName") String firstName, @NotNull @QueryParam("lastName") String lastName, @NotNull @QueryParam("password") String password, @NotNull @QueryParam("email") String email) {
+        if (userEntityDao.findByUsername(username) != null || userEntityDao.findByEmail(email) != null) {
             throw new WebApplicationException(Response.status(400).build());
         }
-        UserEntity entity = userEntityDao.create(firstName, lastName, email, password, role, cash);
+        UserEntity entity = userEntityDao.create(username, firstName, lastName, email, password);
         return entity;
     }
 

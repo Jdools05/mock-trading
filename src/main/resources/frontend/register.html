@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+</head>
+<body>
+
+<div style="text-align: center;">
+    <h3>JHS Mock Trading Registration</h3>
+</div>
+<form action="/api/v1/user/create">
+    <label for="username"><b>Username</b></label>
+    <input type="text" placeholder="Enter Username" name="username" id="username" required>
+
+    <label for="firstName"><b>First Name</b></label>
+    <input type="text" placeholder="Enter First Name" name="firstName" id="firstName" required>
+
+    <label for="lastName"><b>Last Name</b></label>
+    <input type="text" placeholder="Enter Last Name" name="lastName" id="lastName" required>
+
+    <label for="email"><b>Email</b></label>
+    <input type="text" placeholder="Enter Email" name="email" id="email" required>
+
+    <label for="password"><b>Password</b></label>
+    <input type="password" placeholder="Enter Password" name="password" id="password" pattern="" required>
+
+    <label for="passwordValidate"><b>Confirm Password</b></label>
+    <input type="password" placeholder="Confirm Password" name="passwordValidate" id="passwordValidate" pattern="" required>
+
+    <button type="submit">Register</button>
+
+</form>
+</body>
+<script>
+</script>
+</html>
