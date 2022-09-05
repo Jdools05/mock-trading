@@ -62,12 +62,20 @@ public class UserResource {
         return quote;
     }
 
+    @GET
+    @Path("/username-available")
+    @PermitAll
+    public boolean isUsernameAvailable(@Context SecurityContext context, @QueryParam("username") String username) {
+        return userEntityDao.findByUsername(username) == null;
+    }
+
     @POST
     @Path("/create")
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
     @PermitAll
     public UserEntity createUser(@NotNull @QueryParam("username") String username, @NotNull @QueryParam("firstName") String firstName, @NotNull @QueryParam("lastName") String lastName, @NotNull @QueryParam("password") String password, @NotNull @QueryParam("email") String email) {
+        System.out.println("Creating user: " + username);
         if (userEntityDao.findByUsername(username) != null || userEntityDao.findByEmail(email) != null) {
             throw new WebApplicationException(Response.status(400).build());
         }
