@@ -6,42 +6,128 @@
 </head>
 <body>
 
-<header>header area</header>
-<nav>
-    <ul id="user-list">
+<h2>List of all users</h2>
+<button onclick="getUserList()">Refresh</button>
+<table id="user-list"></table>
 
-    </ul>
-</nav>
 
-<footer>footer area</footer>
 
 </body>
 
+<style>
+    th {
+        border: 2px black solid;
+    }
+
+    #hidden {
+        display: none;
+        height: 100px;
+        background: red;
+    }
+
+    .transaction-label {
+        color: blue;
+        text-decoration: underline;
+    }
+
+    .transaction-label:hover {
+        cursor: pointer;
+        color: darkblue;
+    }
+
+
+    :checked ~ #hidden {
+        display: block;
+    }
+</style>
+
 <script>
 
-    window.onload = populateUserList;
+    class User {
 
-    async function populateUserList() {
-        const listView = document.getElementById("user-list");
-        const data = await getUserList();
+        constructor(json) {
+            this.username = json.username;
+            this.firstName = json.firstName;
+            this.lastName = json.lastName;
+            this.email = json.email;
+            this.password = json.password;
+            this.cash = json.cash;
+            this.role = json.role;
+        }
+    }
+
+    window.onload = checkUser;
+
+    async function checkUser() {
+        const token = getCookie("token");
+        if (token === "" || !await validateUser()) {
+            window.location.replace("https://mock-trading-dev.jordan-dooley.celestialdata.net/login");
+        } else {
+            await getUserList();
+        }
+    }
+
+    function populateUserList(data) {
+        const userList = document.getElementById("user-list");
+        while(userList.firstChild) {
+            userList.removeChild(userList.firstChild);
+        }
+        let columns = ["Username", "First Name", "Last Name", "Email", "Cash", "Role", "Transactions"];
+        userList.appendChild(document.createElement("tr"));
+        for (let c in columns) {
+            let th = document.createElement("th");
+            th.textContent = columns[c];
+            userList.appendChild(th);
+        }
         for (let i = 0; i < data.length; i++) {
-            let user = data[i];
-            let li = document.createElement("li");
-            li.appendChild(document.createTextNode(user.username));
-            listView.appendChild(li);
+            let user = new User(data[i]);
+            let tr = document.createElement("tr");
+            let thName = document.createElement("th");
+            thName.textContent = user.username;
+            let thFirst = document.createElement("th");
+            thFirst.textContent = user.firstName;
+            let thLast = document.createElement("th");
+            thLast.textContent = user.lastName;
+            let thEmail = document.createElement("th");
+            thEmail.textContent = user.email;
+            let thCash = document.createElement("th");
+            thCash.textContent = user.cash;
+            let thRole = document.createElement("th");
+            thRole.textContent = user.role;
+            let thTransactions = document.createElement("th");
+
+            let input = document.createElement("input");
+            input.type = "checkbox";
+            input.id = "transactions-" + user.username;
+            input.style.display = "none";
+            let label = document.createElement("label");
+            label.classList.add("transaction-label");
+            label.htmlFor = "transactions-" + user.username;
+            label.textContent = "Show/hide";
+            let div = document.createElement("div");
+            div.id = "hidden";
+            div.textContent = "Hidden";
+
+
+            thTransactions.append(input, label, div);
+            tr.append(thName, thFirst, thLast, thEmail, thCash, thRole, thTransactions);
+            userList.appendChild(tr);
         }
     }
 
     async function getUserList() {
         let Http = new XMLHttpRequest();
-        let url = "https://mock-trading-dev.jordan-dooley.celestialdata.net/api/v1/users/list";
+        let url = "http://localhost:8080/api/v1/users/list";
+        // let url = "https://mock-trading-dev.jordan-dooley.celestialdata.net/api/v1/users/list";
         Http.open("GET", url);
         Http.setRequestHeader("Authorization", "Basic " + getUserToken());
         Http.send();
 
         Http.onreadystatechange = (e) => {
+            console.log(Http.status);
             if (Http.status === 200) {
-                return JSON.parse(Http.responseText);
+                populateUserList(JSON.parse(Http.responseText));
+                console.log(Http.responseText);
             }
         }
     }
@@ -64,10 +150,6 @@
             }
         }
         return "";
-    }
-
-    function getUserToken() {
-        return getCookie("token");
     }
 
 </script>
