@@ -115,6 +115,25 @@
         }
     }
 
+    async function validateUser() {
+        let Http = new XMLHttpRequest();
+        let url = "https://mock-trading-dev.jordan-dooley.celestialdata.net/api/v1/users/validate";
+        Http.open("GET", url);
+        Http.setRequestHeader("Authorization", "Basic " + getUserToken())
+        Http.send();
+
+        Http.onreadystatechange = (e) => {
+            if (Http.status === 401 || Http.status === 403 || Http.status === 500) {
+                console.log("Rejected user!");
+                return false;
+            }
+            if (Http.status === 200) {
+                console.log("Accepted user!");
+                return true;
+            }
+        }
+    }
+
     async function getUserList() {
         let Http = new XMLHttpRequest();
         let url = "https://mock-trading-dev.jordan-dooley.celestialdata.net/api/v1/users/list";
