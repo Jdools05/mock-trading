@@ -2,6 +2,7 @@ package apis;
 
 import clients.models.finnhub.FinnhubQuote;
 import clients.services.FinancialResourceClient;
+import com.tietoevry.quarkus.resteasy.problem.HttpProblem;
 import database.daos.StockEntityDao;
 import database.daos.TransactionHistoryDao;
 import database.daos.UserEntityDao;
@@ -20,6 +21,7 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+import java.net.URI;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -77,7 +79,12 @@ public class UserResource {
     public UserEntity createUser(@NotNull @QueryParam("username") String username, @NotNull @QueryParam("firstName") String firstName, @NotNull @QueryParam("lastName") String lastName, @NotNull @QueryParam("password") String password, @NotNull @QueryParam("email") String email) {
         System.out.println("Creating user: " + username);
         if (userEntityDao.findByUsername(username) != null || userEntityDao.findByEmail(email) != null) {
-            throw new WebApplicationException(Response.status(400).build());
+            throw HttpProblem.builder()
+                    .withStatus(Response.Status.fromStatusCode(422))
+                    .withTitle("User Already Exists")
+                    .withDetail("A user with the username of " + username + " already exists in the system.")
+                    .withInstance(URI.create("/api/v1/users/create"))
+                    .build();
         }
         UserEntity entity = userEntityDao.create(username, firstName, lastName, email, password);
         return entity;

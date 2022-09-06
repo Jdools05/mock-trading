@@ -9,7 +9,7 @@
 <div style="text-align: center;">
     <h3>JHS Mock Trading Registration</h3>
 </div>
-<form onsubmit="return verifyInfo();" method="post" action="/api/v1/users/create">
+<div>
     <label for="username"><b>Username</b></label>
     <input type="text" placeholder="Enter Username" name="username" id="username"
            pattern="^(?=[a-zA-Z0-9._]{3,20}$)(?!.*[_.]{2})[^_.].*[^_.]$" required>
@@ -25,17 +25,17 @@
            required>
 
     <label for="password"><b>Password</b></label>
-    <input type="password" placeholder="Enter Password" name="password" id="password" pattern="^\w(\w|[!@#$%]){4,32}"
+    <input type="password" placeholder="Enter Password" name="password" id="password" pattern="^\w(\w|[!@#$%*]){4,32}"
            required>
 
     <label for="passwordValidate"><b>Confirm Password</b></label>
     <input type="password" placeholder="Confirm Password" name="passwordValidate" id="passwordValidate"
-           pattern="^\w(\w|[!@#$%]){4,32}" required>
+           pattern="^\w(\w|[!@#$%*]){4,32}" required>
     <p id="mismatchedPasswordLabel" style="display: none">Passwords do not match!</p>
 
-    <button type="submit">Register</button>
+    <button id="register-button" onclick="verifyInfo()">Register</button>
 
-</form>
+</div>
 </body>
 <script>
 
@@ -59,20 +59,20 @@
         console.log("Passwords match");
 
         let Http = new XMLHttpRequest();
-        let url = '/api/v1/users/create?username=' + document.getElementById("username").value
+        let url = window.location.origin + '/api/v1/users/create?username=' + document.getElementById("username").value
             + '&firstName=' + document.getElementById("firstName").value + '&lastName='
             + document.getElementById("lastName").value + '&email='
             + document.getElementById("email").value + '&password='
             + document.getElementById("password").value;
         Http.open("POST", url);
-        // Http.send();
+        Http.send();
 
         Http.onreadystatechange = (e) => {
             if (Http.readyState === 4) {
                 if (Http.status === 200) {
                     window.location.href = "/login";
                 } else {
-                    console.log("Error: " + Http.responseText);
+                    console.log("Error: " + Http.response);
                 }
             }
         }
