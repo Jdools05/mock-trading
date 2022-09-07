@@ -52,6 +52,9 @@
         <button onclick="createTransaction()">Create Transaction</button>
     </div>
 </div>
+<footer>
+    <a href="/admin" id="admin-page-footer-link" style="display: none">Admin Page</a>
+</footer>
 </body>
 <style>
     table {
@@ -61,6 +64,12 @@
 
     th {
         border: 1px solid black;
+    }
+
+    footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
     }
 </style>
 <script>
@@ -94,6 +103,9 @@
 
         Http.onreadystatechange = (e) => {
             let user = new User(JSON.parse(Http.responseText));
+            if (user.role === 'admin') {
+                document.getElementById('admin-page-footer-link').style.display = 'block';
+            }
             document.getElementById('user-cash').innerText = 'Cash: $' + user.cash;
             let userStockInv = document.getElementById('user-stock-inv');
             userStockInv.innerHTML = '<tr><th>Stock</th><th>Amount</th></tr>';

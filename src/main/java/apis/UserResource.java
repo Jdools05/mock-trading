@@ -84,11 +84,19 @@ public class UserResource {
     @PermitAll
     public UserEntity createUser(@NotNull @QueryParam("username") String username, @NotNull @QueryParam("firstName") String firstName, @NotNull @QueryParam("lastName") String lastName, @NotNull @QueryParam("password") String password, @NotNull @QueryParam("email") String email) {
         System.out.println("Creating user: " + username);
-        if (userEntityDao.findByUsername(username) != null || userEntityDao.findByEmail(email) != null) {
+        if (userEntityDao.findByUsername(username) != null) {
             throw HttpProblem.builder()
                     .withStatus(Response.Status.fromStatusCode(422))
                     .withTitle("User Already Exists")
                     .withDetail("A user with the username of " + username + " already exists in the system.")
+                    .withInstance(URI.create("/api/v1/users/create"))
+                    .build();
+        }
+        if (userEntityDao.findByEmail(email) != null) {
+            throw HttpProblem.builder()
+                    .withStatus(Response.Status.fromStatusCode(422))
+                    .withTitle("User Already Exists")
+                    .withDetail("A user with the email of " + email + " already exists in the system.")
                     .withInstance(URI.create("/api/v1/users/create"))
                     .build();
         }

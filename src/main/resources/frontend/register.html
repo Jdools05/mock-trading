@@ -62,8 +62,8 @@
         let url = window.location.origin + '/api/v1/users/create?username=' + document.getElementById("username").value
             + '&firstName=' + document.getElementById("firstName").value + '&lastName='
             + document.getElementById("lastName").value + '&email='
-            + document.getElementById("email").value + '&password='
-            + document.getElementById("password").value;
+            + encodeURIComponent(document.getElementById("email").value) + '&password='
+            + encodeURIComponent(document.getElementById("password").value);
         Http.open("POST", url);
         Http.send();
 
