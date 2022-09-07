@@ -5,43 +5,160 @@
     <title>Stock Trading Home</title>
 </head>
 <body>
-    <table>
-        <tr>
-            <th>Symbol</th>
-            <th>Cost</th>
-            <th>Change</th>
-            <th>Percent Change</th>
-            <th>High</th>
-            <th>Low</th>
-            <th>Open</th>
-            <th>Previous Close</th>
-        </tr>
-        <tr>
-            <th id="symbol">Symbol</th>
-            <th id="cost">Cost</th>
-            <th id="change">Change</th>
-            <th id="percent-change">Percent Change</th>
-            <th id="high">High</th>
-            <th id="low">Low</th>
-            <th id="open">Open</th>
-            <th id="close">Previous Close</th>
-        </tr>
-    </table>
-    <label for="symbol-input">Symbol:</label><input id="symbol-input" maxlength="8" placeholder="BTC-USD"/>
-    <button onclick="updateStockDisplay(document.getElementById('symbol-input').value.toUpperCase())">Update display</button>
+<button onclick="logout()">Logout</button>
+<h3 id="user-cash">Cash: </h3>
+<label for="user-stock-inv">Stock Inventory</label>
+<table id="user-stock-inv">
+    <tr>
+        <th>Stock</th>
+        <th>Amount</th>
+    </tr>
+</table>
+<label for="stock-lookup">Stock Lookup</label>
+<table id="stock-lookup">
+    <tr>
+        <th>Symbol</th>
+        <th>Cost</th>
+        <th>Change</th>
+        <th>Percent Change</th>
+        <th>High</th>
+        <th>Low</th>
+        <th>Open</th>
+        <th>Previous Close</th>
+    </tr>
+    <tr>
+        <th id="symbol">Symbol</th>
+        <th id="cost">Cost</th>
+        <th id="change">Change</th>
+        <th id="percent-change">Percent Change</th>
+        <th id="high">High</th>
+        <th id="low">Low</th>
+        <th id="open">Open</th>
+        <th id="close">Previous Close</th>
+    </tr>
+</table>
+<label for="symbol-input">Symbol:</label><input id="symbol-input" maxlength="8" placeholder="BTC-USD"/>
+<button onclick="updateStockDisplay(document.getElementById('symbol-input').value.toUpperCase())">Update display
+</button>
+<div id="create-transaction-div">
+    <button onclick="showTransactionInputs()" id="show-transaction-button">Show Transaction Form</button>
+    <div id="transaction-inputs" style="display: none">
+        <label for="transaction-type">Transaction Type:</label>
+        <select id="transaction-type">
+            <option value="BUY">Buy</option>
+            <option value="SELL">Sell</option>
+        </select>
+        <label for="transaction-quantity">Quantity:</label><input id="transaction-quantity" type="number" required/>
+        <button onclick="createTransaction()">Create Transaction</button>
+    </div>
+</div>
 </body>
 <style>
     table {
         border: 2px solid black;
+        padding: 20px;
     }
+
     th {
         border: 1px solid black;
     }
-    #change {
-
-    }
 </style>
 <script>
+
+    class User {
+
+        constructor(json) {
+            this.username = json.username;
+            this.firstName = json.firstName;
+            this.lastName = json.lastName;
+            this.email = json.email;
+            this.password = json.password;
+            this.cash = json.cash;
+            this.role = json.role;
+            this.transactions = json.transactions;
+            this.stockInventory = json.stocks;
+        }
+
+        getStockInventory() {
+            return this.stockInventory;
+        }
+    }
+
+    window.onload = getUserStockInventory;
+
+    function getUserStockInventory() {
+        let Http = new XMLHttpRequest();
+        let url = window.location.origin + '/api/v1/users/me';
+        Http.open("GET", url);
+        Http.send();
+
+        Http.onreadystatechange = (e) => {
+            let user = new User(JSON.parse(Http.responseText));
+            document.getElementById('user-cash').innerText = 'Cash: $' + user.cash;
+            let userStockInv = document.getElementById('user-stock-inv');
+            userStockInv.innerHTML = '<tr><th>Stock</th><th>Amount</th></tr>';
+            for (let i = 0; i < user.stockInventory.length; i++) {
+                let stock = user.stockInventory[i];
+                let row = userStockInv.insertRow();
+                let symbol = row.insertCell(0);
+                let amount = row.insertCell(1);
+                symbol.innerText = stock.symbol;
+                amount.innerText = stock.amount;
+            }
+        }
+    }
+
+    function createTransaction() {
+        let symbol = document.getElementById('symbol-input').value.toUpperCase();
+        let quantity = document.getElementById('transaction-quantity').value;
+        let type = document.getElementById('transaction-type').value;
+        if (symbol === '' || quantity === '') {
+            alert('Please enter a symbol and quantity');
+            return;
+        }
+        let Httpquote = new XMLHttpRequest();
+        let urlquote = window.location.origin + '/api/v1/users/quote?symbol=' + symbol;
+        Httpquote.open("GET", urlquote);
+        Httpquote.send();
+
+        Httpquote.onreadystatechange = (e) => {
+            if (Httpquote.readyState === 4 && Httpquote.status === 200) {
+                let quote = JSON.parse(Httpquote.responseText);
+                console.log(quote);
+                let price = quote.cost;
+                if (!confirm('Are you sure you want to ' + type + ' ' + quantity + ' shares of ' + symbol + ' for $' + price + ' per share?')) {
+                    return;
+                }
+                let Http = new XMLHttpRequest();
+                let url = window.location.origin + '/api/v1/users/transaction?symbol=' + symbol + '&amount=' + quantity + '&pricePu='+ price +'&tradeType=' + type;
+                Http.open("PUT", url);
+                Http.send();
+                Http.onreadystatechange = (e) => {
+                    if (Http.readyState === 4 && Http.status === 200) {
+                        alert('Transaction created successfully');
+                        getUserStockInventory();
+                    } else if (Http.readyState === 4 && Http.status === 400) {
+                        alert('Transaction failed: ' + Http.responseText);
+                    }
+                }
+            } else if (Httpquote.readyState === 4 && Httpquote.status === 400) {
+                alert('Transaction failed: ' + Httpquote.responseText);
+            }
+        }
+
+    }
+
+    function showTransactionInputs() {
+        let transactionInputs = document.getElementById("transaction-inputs");
+        let transactionButton = document.getElementById("show-transaction-button");
+        if (transactionInputs.style.display === "none") {
+            transactionInputs.style.display = "block"
+            transactionButton.innerText = "Hide Transaction Form";
+        } else {
+            transactionInputs.style.display = "none";
+            transactionButton.innerText = "Show Transaction Form";
+        }
+    }
 
     function updateStockDisplay(symbol) {
         let Http = new XMLHttpRequest();
@@ -65,6 +182,11 @@
                 }
             }
         }
+    }
+
+    function logout() {
+        document.cookie = 'quarkus-credential=; Max-Age=0'
+        window.location.href = "/login";
     }
 </script>
 </html>
