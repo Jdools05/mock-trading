@@ -5,16 +5,19 @@
     <title>Stock Trading Home</title>
 </head>
 <body>
+<div style="text-align: center;">
+    <h3>JHS Mock Trading Home</h3>
+</div>
 <button onclick="logout()">Logout</button>
 <h3 id="user-cash">Cash: </h3>
-<label for="user-stock-inv">Stock Inventory</label>
+<label for="user-stock-inv" id="user-stock-inv-label">Stock Inventory</label>
 <table id="user-stock-inv">
     <tr>
         <th>Stock</th>
         <th>Amount</th>
     </tr>
 </table>
-<label for="stock-lookup">Stock Lookup</label>
+<label for="stock-lookup" id="stock-lookup-label">Stock Lookup</label>
 <table id="stock-lookup">
     <tr>
         <th>Symbol</th>
@@ -38,7 +41,8 @@
     </tr>
 </table>
 <label for="symbol-input">Symbol:</label><input id="symbol-input" maxlength="8" placeholder="AAPL"/>
-<button onclick="updateStockDisplay(document.getElementById('symbol-input').value.toUpperCase())">Update display
+<button onclick="updateStockDisplay(document.getElementById('symbol-input').value.toUpperCase())"
+        id="update-display-button">Update display
 </button>
 <div id="create-transaction-div">
     <button onclick="showTransactionInputs()" id="show-transaction-button">Show Transaction Form</button>
@@ -48,7 +52,8 @@
             <option value="BUY">Buy</option>
             <option value="SELL">Sell</option>
         </select>
-        <label for="transaction-quantity">Quantity:</label><input id="transaction-quantity" type="number" min="1" step="1" required/>
+        <label for="transaction-quantity">Quantity:</label><input id="transaction-quantity" type="number" min="1"
+                                                                  step="1" required/>
         <button onclick="createTransaction()">Create Transaction</button>
     </div>
 </div>
@@ -59,9 +64,40 @@
 </footer>
 </body>
 <style>
+
+    label {
+        text-decoration: underline;
+    }
+
+    #user-cash {
+        color: green;
+    }
+
+    #update-display-button {
+        margin-left: 10px;
+    }
+
+    #create-transaction-div {
+        margin-top: 10px;
+    }
+
+    #show-transaction-button {
+        margin-bottom: 10px;
+    }
+
+    #stock-lookup {
+        margin-top: 5px;
+    }
+
+    #user-stock-inv {
+        margin-top: 5px;
+    }
+
     table {
         border: 2px solid black;
         padding: 20px;
+        margin-top: 10px;
+        margin-bottom: 10px;
     }
 
     th {
@@ -145,7 +181,7 @@
                     return;
                 }
                 let Http = new XMLHttpRequest();
-                let url = window.location.origin + '/api/v1/users/transaction?symbol=' + symbol + '&amount=' + quantity + '&pricePu='+ price +'&tradeType=' + type;
+                let url = window.location.origin + '/api/v1/users/transaction?symbol=' + symbol + '&amount=' + quantity + '&pricePu=' + price + '&tradeType=' + type;
                 Http.open("PUT", url);
                 Http.send();
                 Http.onreadystatechange = (e) => {
@@ -189,13 +225,13 @@
                 console.log(data);
                 if (data.cost != null) {
                     document.getElementById("symbol").textContent = data.symbol;
-                    document.getElementById("cost").textContent = "$" + data.cost.toString();
-                    document.getElementById("change").textContent = "$" + data.change.toString();
+                    document.getElementById("cost").textContent = "$" + data.cost.toLocaleString('en-US');
+                    document.getElementById("change").textContent = "$" + data.change.toLocaleString('en-US');
                     document.getElementById("percent-change").textContent = +data.percentChange.toString() + "%";
-                    document.getElementById("high").textContent = "$" + data.high.toString();
-                    document.getElementById("low").textContent = "$" + data.low.toString();
-                    document.getElementById("open").textContent = "$" + data.dayOpen.toString();
-                    document.getElementById("close").textContent = "$" + data.previousClose.toString();
+                    document.getElementById("high").textContent = "$" + data.high.toLocaleString('en-US');
+                    document.getElementById("low").textContent = "$" + data.low.toLocaleString('en-US');
+                    document.getElementById("open").textContent = "$" + data.dayOpen.toLocaleString('en-US');
+                    document.getElementById("close").textContent = "$" + data.previousClose.toLocaleString('en-US');
                 }
             }
         }
