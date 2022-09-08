@@ -9,6 +9,7 @@
     <h3>JHS Mock Trading Home</h3>
 </div>
 <button onclick="logout()">Logout</button>
+<h3 id="welcome-message">Welcome name!</h3>
 <h3 id="user-cash">Cash: </h3>
 <label for="user-stock-inv" id="user-stock-inv-label">Stock Inventory</label>
 <table id="user-stock-inv">
@@ -59,7 +60,7 @@
 </div>
 <footer>
     <a href="/admin" id="admin-page-footer-link" style="display: none">Admin Page</a>
-    <p>If anyone knows how to do HTML and CSS, please contact me at: </p>
+    <p>If you want to redesign this webpage, please contact me at: </p>
     <a href="mailto: jordan.dooley@k12.nd.us">jordan.dooley@k12.nd.us</a>
 </footer>
 </body>
@@ -151,6 +152,7 @@
                 document.getElementById('admin-page-footer-link').style.display = 'block';
             }
             document.getElementById('user-cash').innerText = 'Cash: $' + user.cash.toLocaleString("en-US");
+            document.getElementById('welcome-message').innerText = 'Welcome ' + user.firstName + '!';
             let userStockInv = document.getElementById('user-stock-inv');
             userStockInv.innerHTML = '<tr><th>Stock</th><th>Amount</th></tr>';
             for (let i = 0; i < user.stockInventory.length; i++) {
