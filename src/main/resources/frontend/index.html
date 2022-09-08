@@ -37,7 +37,7 @@
         <th id="close">Previous Close</th>
     </tr>
 </table>
-<label for="symbol-input">Symbol:</label><input id="symbol-input" maxlength="8" placeholder="BTC-USD"/>
+<label for="symbol-input">Symbol:</label><input id="symbol-input" maxlength="8" placeholder="AAPL"/>
 <button onclick="updateStockDisplay(document.getElementById('symbol-input').value.toUpperCase())">Update display
 </button>
 <div id="create-transaction-div">
@@ -48,7 +48,7 @@
             <option value="BUY">Buy</option>
             <option value="SELL">Sell</option>
         </select>
-        <label for="transaction-quantity">Quantity:</label><input id="transaction-quantity" type="number" required/>
+        <label for="transaction-quantity">Quantity:</label><input id="transaction-quantity" type="number" min="1" step="1" required/>
         <button onclick="createTransaction()">Create Transaction</button>
     </div>
 </div>
@@ -109,7 +109,7 @@
             if (user.role === 'admin') {
                 document.getElementById('admin-page-footer-link').style.display = 'block';
             }
-            document.getElementById('user-cash').innerText = 'Cash: $' + user.cash;
+            document.getElementById('user-cash').innerText = 'Cash: $' + user.cash.toLocaleString("en-US");
             let userStockInv = document.getElementById('user-stock-inv');
             userStockInv.innerHTML = '<tr><th>Stock</th><th>Amount</th></tr>';
             for (let i = 0; i < user.stockInventory.length; i++) {
@@ -158,6 +158,8 @@
                 }
             } else if (Httpquote.readyState === 4 && Httpquote.status === 400) {
                 alert('Transaction failed: ' + Httpquote.responseText);
+            } else if (Httpquote.readyState === 4 && Httpquote.status === 422) {
+                alert('Transaction failed: ' + Httpquote.responseText);
             }
         }
 
@@ -186,7 +188,7 @@
                 let data = JSON.parse(Http.responseText);
                 console.log(data);
                 if (data.cost != null) {
-                    document.getElementById("symbol").textContent = data.symbol.toString();
+                    document.getElementById("symbol").textContent = data.symbol;
                     document.getElementById("cost").textContent = "$" + data.cost.toString();
                     document.getElementById("change").textContent = "$" + data.change.toString();
                     document.getElementById("percent-change").textContent = +data.percentChange.toString() + "%";

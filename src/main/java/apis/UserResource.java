@@ -6,6 +6,7 @@ import com.tietoevry.quarkus.resteasy.problem.HttpProblem;
 import database.daos.StockEntityDao;
 import database.daos.TransactionHistoryDao;
 import database.daos.UserEntityDao;
+import database.daos.WhitelistStockEntityDao;
 import database.entities.StockEntity;
 import database.entities.TransactionHistoryEntity;
 import database.entities.UserEntity;
@@ -47,6 +48,9 @@ public class UserResource {
 
     @Inject
     StockEntityDao stockEntityDao;
+
+    @Inject
+    WhitelistStockEntityDao whitelistStockEntityDao;
 
     @GET
     @Path("/list")
@@ -121,6 +125,22 @@ public class UserResource {
                     .withStatus(Response.Status.fromStatusCode(422))
                     .withTitle("Invalid Price")
                     .withDetail("The price per unit must be greater than 0.")
+                    .withInstance(URI.create("/api/v1/users/transaction"))
+                    .build();
+        }
+        if (!whitelistStockEntityDao.isWhitelisted(symbol)) {
+            throw HttpProblem.builder()
+                    .withStatus(Response.Status.fromStatusCode(422))
+                    .withTitle("Invalid Symbol")
+                    .withDetail("The symbol " + symbol + " is not whitelisted.")
+                    .withInstance(URI.create("/api/v1/users/transaction"))
+                    .build();
+        }
+        if (amount <= 0) {
+            throw HttpProblem.builder()
+                    .withStatus(Response.Status.fromStatusCode(422))
+                    .withTitle("Invalid Amount")
+                    .withDetail("The amount must be greater than 0.")
                     .withInstance(URI.create("/api/v1/users/transaction"))
                     .build();
         }
