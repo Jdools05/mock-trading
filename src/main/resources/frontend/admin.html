@@ -37,6 +37,16 @@
         color: darkblue;
     }
 
+    .stock-label {
+        color: blue;
+        text-decoration: underline;
+    }
+
+    .stock-label:hover {
+        cursor: pointer;
+        color: darkblue;
+    }
+
 
     :checked ~ #hidden {
         display: block;
@@ -58,6 +68,7 @@
             this.email = json.email;
             this.password = json.password;
             this.cash = json.cash;
+            this.stocks = json.stocks;
             this.role = json.role;
             this.transactions = json.transactions;
         }
@@ -68,7 +79,7 @@
         while(userList.firstChild) {
             userList.removeChild(userList.firstChild);
         }
-        let columns = ["Username", "First Name", "Last Name", "Email", "Cash", "Role", "Transactions"];
+        let columns = ["Username", "First Name", "Last Name", "Email", "Cash", "Stocks", "Role", "Transactions"];
         userList.appendChild(document.createElement("tr"));
         for (let c in columns) {
             let th = document.createElement("th");
@@ -88,10 +99,46 @@
             thEmail.textContent = user.email;
             let thCash = document.createElement("th");
             thCash.textContent = user.cash;
+            let thStocks = document.createElement("th");
             let thRole = document.createElement("th");
             thRole.textContent = user.role;
             let thTransactions = document.createElement("th");
 
+            // stocks here:
+            let stockInput = document.createElement("input");
+            stockInput.type ="checkbox";
+            stockInput.id = "stock-input-" + user.username;
+            stockInput.style.display = "none";
+            let stockLabel = document.createElement("label");
+            stockLabel.classList.add("stock-label");
+            stockLabel.htmlFor = "stock-input-" + user.username;
+            stockLabel.textContent = "Show/Hide";
+            let stockDiv = document.createElement("div");
+            stockDiv.id = "hidden";
+            let stockTable = document.createElement("table");
+            let stockColumns = ["Symbol", "Quantity"];
+            let stockTr = document.createElement("tr");
+            for (let c in stockColumns) {
+                let th = document.createElement("th");
+                th.textContent = stockColumns[c];
+                stockTr.appendChild(th);
+            }
+            stockTable.appendChild(stockTr);
+            for (let s in user.stocks) {
+                let stock = user.stocks[s];
+                let tr = document.createElement("tr");
+                let thSymbol = document.createElement("th");
+                thSymbol.textContent = stock.symbol;
+                let thQuantity = document.createElement("th");
+                thQuantity.textContent = stock.amount;
+                tr.appendChild(thSymbol);
+                tr.appendChild(thQuantity);
+                stockTable.appendChild(tr);
+            }
+            stockDiv.appendChild(stockTable);
+            thStocks.append(stockInput, stockLabel, stockDiv);
+
+            // transactions here:
             let input = document.createElement("input");
             input.type = "checkbox";
             input.id = "transactions-" + user.username;
@@ -99,7 +146,7 @@
             let label = document.createElement("label");
             label.classList.add("transaction-label");
             label.htmlFor = "transactions-" + user.username;
-            label.textContent = "Show/hide";
+            label.textContent = "Show/Hide";
             let div = document.createElement("div");
             div.id = "hidden";
             let table = document.createElement("table");
@@ -139,10 +186,12 @@
 
 
             thTransactions.append(input, label, div);
-            tr.append(thName, thFirst, thLast, thEmail, thCash, thRole, thTransactions);
+            tr.append(thName, thFirst, thLast, thEmail, thCash, thStocks, thRole, thTransactions);
             userList.appendChild(tr);
         }
     }
+
+    window.onload = getUserList;
 
     async function getUserList() {
         let Http = new XMLHttpRequest();
