@@ -21,7 +21,7 @@
     <input type="text" placeholder="Enter Last Name" name="lastName" id="lastName" required>
 
     <label for="email"><b>Email</b></label>
-    <input type="text" placeholder="Enter Email" name="email" id="email" pattern="^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$"
+    <input type="text" placeholder="Enter Email" name="email" id="email" pattern="^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$"
            required>
 
     <label for="password"><b>Password</b></label>
@@ -31,6 +31,10 @@
     <label for="passwordValidate"><b>Confirm Password</b></label>
     <input type="password" placeholder="Confirm Password" name="passwordValidate" id="passwordValidate"
            pattern="^\w(\w|[!@#$%*]){4,32}" required>
+    <div id="password-parameter" style="margin-bottom: 10px; margin-top: 10px;">
+        <p>Password must be between 5 and 32 characters long</p>
+        <p>Passwords can contain letters, numbers, and these special characters: ! @ # $ % *</p>
+    </div>
     <p id="mismatchedPasswordLabel" style="display: none">Passwords do not match!</p>
 
     <button id="register-button" onclick="verifyInfo()">Register</button>
@@ -45,6 +49,7 @@
 <script>
 
     let isUsernameValid = false;
+    let isEmailValid = false;
 
     function verifyInfo() {
 
@@ -53,6 +58,10 @@
         if (!isUsernameValid) return false;
 
         console.log("Username is valid");
+
+        if (!isEmailValid) return false;
+
+        console.log("Email is valid");
 
         let password = document.getElementById("password").value;
         let passwordValidate = document.getElementById("passwordValidate").value;
@@ -99,7 +108,7 @@
                         isUsernameValid = true;
                         console.log("Username is available");
                     } else {
-                        this.style.backgroundColor = "red";
+                        this.style.backgroundColor = "#FF6666";
                         isUsernameValid = false;
                         console.log("Username is not available");
                     }
@@ -112,16 +121,59 @@
 
     document.getElementById("username").addEventListener("input", getUsernameAvailability);
 
-    document.getElementById("passwordValidate").addEventListener("change", function () {
-        if (document.getElementById("password").value !== document.getElementById("passwordValidate").value) {
-            document.getElementById("mismatchedPasswordLabel").style.display = "block";
-            document.getElementById("password").style.backgroundColor = "red";
-            document.getElementById("passwordValidate").style.backgroundColor = "red";
+    document.getElementById("password").addEventListener("change", function () {
+        this.value = this.value.trim();
+        if (!/^\w(\w|[!@#$%*]){4,32}/.test(this.value)) {
+            this.style.backgroundColor = "#FF6666";
         } else {
-            document.getElementById("mismatchedPasswordLabel").style.display = "none";
-            document.getElementById("password").style.backgroundColor = "lightgreen";
-            document.getElementById("passwordValidate").style.backgroundColor = "lightgreen";
+            this.style.backgroundColor = "lightgreen";
+            checkPasswordMatch();
         }
     });
+
+    function checkPasswordMatch() {
+        if (document.getElementById("password").value !== document.getElementById("passwordValidate").value) {
+            document.getElementById("mismatchedPasswordLabel").style.display = "block";
+            document.getElementById("passwordValidate").style.backgroundColor = "#FF6666";
+        } else {
+            document.getElementById("mismatchedPasswordLabel").style.display = "none";
+            document.getElementById("passwordValidate").style.backgroundColor = "lightgreen";
+        }
+    }
+
+    document.getElementById("passwordValidate").addEventListener("change", checkPasswordMatch);
+
+    document.getElementById("email").addEventListener("input", function () {
+        let validFormat = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(this.value);
+        if (!validFormat) {
+            this.style.backgroundColor = "#FF6666";
+            isEmailValid = false;
+            console.log("Email is not valid");
+            return;
+        }
+        let Http = new XMLHttpRequest();
+        let url = window.location.origin + "/api/v1/users/email-available?email=" + this.value;
+        Http.open("GET", url);
+        Http.send();
+
+        Http.onreadystatechange = (e) => {
+            if (Http.readyState === 4) {
+                if (Http.status === 200) {
+                    if (Http.responseText === "true") {
+                        this.style.backgroundColor = "lightgreen";
+                        isEmailValid = true;
+                        console.log("Email is available");
+                    } else {
+                        this.style.backgroundColor = "#FF6666";
+                        isEmailValid = false;
+                        console.log("Email is not available");
+                    }
+                } else {
+                    console.log("Error: " + Http.responseText);
+                }
+            }
+        }
+    });
+
 </script>
 </html>

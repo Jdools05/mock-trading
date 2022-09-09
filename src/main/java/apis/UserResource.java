@@ -115,6 +115,13 @@ public class UserResource {
         return ConfigProvider.getConfig().getValue("ApiKeys.finnhubApiKey", String.class);
     }
 
+    @GET
+    @Path("email-available")
+    @PermitAll
+    public boolean isEmailAvailable(@Context SecurityContext context, @QueryParam("email") String email) {
+        return userEntityDao.findByEmail(email) == null;
+    }
+
     @PUT
     @Path("/transaction")
     @Produces(MediaType.APPLICATION_JSON)
