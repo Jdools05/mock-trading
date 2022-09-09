@@ -25,8 +25,6 @@
 
     #hidden {
         display: none;
-        height: 100px;
-        background: red;
     }
 
     .transaction-label {
@@ -104,7 +102,40 @@
             label.textContent = "Show/hide";
             let div = document.createElement("div");
             div.id = "hidden";
-            div.textContent = "Hidden";
+            let table = document.createElement("table");
+            let tr1 = document.createElement("tr");
+            let th2 = document.createElement("th");
+            th2.textContent = "Stock";
+            let th3 = document.createElement("th");
+            th3.textContent = "Quantity";
+            let th4 = document.createElement("th");
+            th4.textContent = "Price";
+            let th5 = document.createElement("th");
+            th5.textContent = "Date";
+            let th6 = document.createElement("th");
+            th6.textContent = "Type";
+            tr1.append(th2, th3, th4, th5, th6);
+            table.appendChild(tr1);
+            div.appendChild(table);
+            for (let j = 0; j < user.transactions.length; j++) {
+                let transaction = user.transactions[j];
+                let tr1 = document.createElement("tr");
+                let th1 = document.createElement("th");
+                th1.textContent = transaction.id;
+                let th2 = document.createElement("th");
+                th2.textContent = transaction.stock.symbol;
+                let th3 = document.createElement("th");
+                th3.textContent = transaction.stock.amount;
+                let th4 = document.createElement("th");
+                th4.textContent = transaction.price;
+                let th5 = document.createElement("th");
+                th5.textContent = transaction.timestamp;
+                let th6 = document.createElement("th");
+                th6.textContent = transaction.tradeType;
+                tr1.append(th2, th3, th4, th5, th6);
+                table.appendChild(tr1);
+            }
+            div.appendChild(table);
 
 
             thTransactions.append(input, label, div);
