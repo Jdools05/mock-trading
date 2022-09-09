@@ -168,9 +168,9 @@
 
     function createTransaction() {
         let symbol = document.getElementById('symbol-input').value.toUpperCase();
-        let quantity = document.getElementById('transaction-quantity').value;
+        let quantity = Math.ceil(document.getElementById('transaction-quantity').value);
         let type = document.getElementById('transaction-type').value;
-        if (symbol === '' || quantity === '') {
+        if (symbol === '' || quantity < 1) {
             alert('Please enter a symbol and quantity');
             return;
         }
