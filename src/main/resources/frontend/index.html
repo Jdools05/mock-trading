@@ -199,9 +199,7 @@
                         alert('Transaction failed: ' + Http.responseText);
                     }
                 }
-            } else if (Httpquote.readyState === 4 && Httpquote.status === 400) {
-                alert('Transaction failed: ' + Httpquote.responseText);
-            } else if (Httpquote.readyState === 4 && Httpquote.status === 422) {
+            } else if (Httpquote.readyState === 4 && (Httpquote.status === 422 || Httpquote.status === 500 || Httpquote.status === 400)) {
                 alert('Transaction failed: ' + Httpquote.responseText);
             }
         }
