@@ -185,6 +185,7 @@ public class UserResource {
             if (requestedStock.amount == 0) {
                 userEntity.stocks.remove(requestedStock);
             }
+            userEntity.cash += amount * price;
         }
         TransactionHistoryEntity transactionEntity = transactionHistoryDao.create(stockEntity, price, tradeType);
         userEntity = userEntityDao.appendTransaction(userEntity, transactionEntity);
