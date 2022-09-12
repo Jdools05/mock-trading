@@ -19,28 +19,31 @@
     </tr>
 </table>
 <label for="stock-lookup" id="stock-lookup-label">Stock Lookup</label>
-<table id="stock-lookup">
-    <tr>
-        <th>Symbol</th>
-        <th>Cost</th>
-        <th>Change</th>
-        <th>Percent Change</th>
-        <th>High</th>
-        <th>Low</th>
-        <th>Open</th>
-        <th>Previous Close</th>
-    </tr>
-    <tr>
-        <th id="symbol">Symbol</th>
-        <th id="cost">Cost</th>
-        <th id="change">Change</th>
-        <th id="percent-change">Percent Change</th>
-        <th id="high">High</th>
-        <th id="low">Low</th>
-        <th id="open">Open</th>
-        <th id="close">Previous Close</th>
-    </tr>
-</table>
+<div id="stock-data">
+    <div style="height:200px;"><table id="stock-lookup">
+        <tr>
+            <th>Symbol</th>
+            <th>Cost</th>
+            <th>Change</th>
+            <th>Percent Change</th>
+            <th>High</th>
+            <th>Low</th>
+            <th>Open</th>
+            <th>Previous Close</th>
+        </tr>
+        <tr>
+            <th id="symbol">Symbol</th>
+            <th id="cost">Cost</th>
+            <th id="change">Change</th>
+            <th id="percent-change">Percent Change</th>
+            <th id="high">High</th>
+            <th id="low">Low</th>
+            <th id="open">Open</th>
+            <th id="close">Previous Close</th>
+        </tr>
+    </table></div>
+    <div id="chart-div" style="width: 600px; height: 300px;"></div>
+</div>
 <label for="symbol-input">Symbol:</label><input id="symbol-input" maxlength="8" placeholder="AAPL"/>
 <button onclick="updateStockDisplay(document.getElementById('symbol-input').value.toUpperCase())"
         id="update-display-button">Update display
@@ -72,6 +75,10 @@
 
     #user-cash {
         color: green;
+    }
+
+    #stock-data {
+        display: flex;
     }
 
     #update-display-button {
@@ -106,10 +113,11 @@
     }
 
     footer {
-        position: fixed;
         bottom: 0;
         width: 100%;
         padding-bottom: 7px;
+        background: #dddddd;
+        margin-top: 50px;
     }
 
     body {
@@ -117,7 +125,35 @@
     }
 
 </style>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script>
+
+    google.charts.load('current', {'packages': ['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+            ['Mon', 20, 28, 38, 45],
+            ['Tue', 31, 38, 55, 66],
+            ['Wed', 50, 55, 77, 80],
+            ['Thu', 77, 77, 66, 50],
+            ['Fri', 68, 66, 22, 15]
+            // Treat first row as data as well.
+        ], true);
+
+        var options = {
+            legend: 'none'
+        };
+
+        var chart = new google.visualization.CandlestickChart(document.getElementById('chart-div'));
+
+        chart.draw(data, options);
+    }
+
+    function fetchCandles() {
+
+    }
+
 
     class User {
 

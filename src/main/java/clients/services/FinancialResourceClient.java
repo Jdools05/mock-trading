@@ -1,6 +1,7 @@
 package clients.services;
 
 import clients.authorizations.FinnhubAuthorizationFactory;
+import clients.models.finnhub.FinnhubCandle;
 import clients.models.finnhub.FinnhubQuote;
 import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
@@ -23,4 +24,9 @@ public interface FinancialResourceClient {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     CompletionStage<FinnhubQuote> quote(@QueryParam("symbol") String symbol);
+
+    @Path("stock/candle")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    CompletionStage<FinnhubCandle> candle(@QueryParam("symbol") String symbol, @QueryParam("resolution") String resolution, @QueryParam("from") long from, @QueryParam("to") long to);
 }
