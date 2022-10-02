@@ -156,7 +156,7 @@
             let userStockInv = document.getElementById('user-stock-inv');
             userStockInv.innerHTML = '<tr><th>Stock</th><th>Amount</th></tr>';
             for (let i = 0; i < user.stockInventory.length; i++) {
-                let stock = user.stockInventory[i];
+                let stock = user.getStockInventory()[i];
                 let row = userStockInv.insertRow();
                 let symbol = row.insertCell(0);
                 let amount = row.insertCell(1);

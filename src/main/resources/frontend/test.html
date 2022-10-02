@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mock Trading</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+    <link href="/darkmode.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand" href="#">Mock Trading</a>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">Home</a>
+                </li>
+            </ul>
+        </div>
+        <ul class="navbar-nav mb-2 mb-lg-0">
+            <li class="navbar-brand" id="user-username">NAME</li>
+            <li class="navbar-brand text-success" id="user-balance">$50,000</li>
+            <li>
+                <button class="btn btn-outline-success" type="submit" onclick="logout()">Logout</button>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div class="container text-container">
+    <div class="row">
+        <div class="col-3 text-center card border-success">
+            <div class="card-header">
+                <h4>Stock Inventory</h4>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th scope="col">Stock</th>
+                        <th scope="col">Amount</th>
+                    </tr>
+                    </thead>
+                    <tbody id="stock-table">
+                    <tr>
+                        <td>Apple</td>
+                        <td>10</td>
+                    </tr>
+                    <tr>
+                        <td>Microsoft</td>
+                        <td>20</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col">
+            <div class="col text-center card border-info">
+                <div class="card-header">
+                    <h4>Stock Lookup</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                        <tr>
+                            <th scope="col">Symbol</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Change</th>
+                            <th scope="col">Percent Change</th>
+                            <th scope="col">High</th>
+                            <th scope="col">Low</th>
+                            <th scope="col">Open</th>
+                            <th scope="col">Previous Close</th>
+                        </tr>
+                        </thead>
+                        <tbody id="stock-lookup">
+                        <tr>
+                            <td>Example</td>
+                            <td>$100</td>
+                            <td>$10</td>
+                            <td>10%</td>
+                            <td>$110</td>
+                            <td>$90</td>
+                            <td>$105</td>
+                            <td>$90</td>
+                    </table>
+                    <div class="d-flex">
+                        <button class="btn btn-outline-success me-2" type="submit" onclick="updateStockDisplay()">
+                            Search
+                        </button>
+                        <input class="form-control" id="stock-input" type="search" placeholder="AAPL"
+                               aria-label="Search"/>
+                    </div>
+                </div>
+            </div>
+            <div class="col text-white card border-warning">
+                <div class="card-header">
+                    <h4 class="text-center">Transaction Form</h4>
+                </div>
+                <div class="card-body">
+                    Do you want to buy or sell?
+                    <select class="form-select" id="transaction-type" aria-label="Default select example">
+                        <option selected value="BUY">Buy</option>
+                        <option value="SELL">Sell</option>
+                    </select>
+                    How many shares?
+                    <div class="input-group mb-3">
+                        <input type="number" id="transaction-quantity" class="form-control" placeholder="1" value="1"
+                               min="1"
+                               step="1"
+                               aria-label="Username" aria-describedby="basic-addon1">
+                        <button class="btn btn-outline-success" type="submit" onclick="createTransaction()">Create
+                            Transaction
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8"
+        crossorigin="anonymous"></script>
+<script>
+    window.onload = getUserStockInventory;
+
+    class User {
+
+        constructor(json) {
+            this.username = json.username;
+            this.firstName = json.firstName;
+            this.lastName = json.lastName;
+            this.email = json.email;
+            this.password = json.password;
+            this.cash = json.cash;
+            this.role = json.role;
+            this.transactions = json.transactions;
+            this.stockInventory = json.stocks;
+        }
+
+        getStockInventory() {
+            return this.stockInventory;
+        }
+    }
+
+    function logout() {
+        document.cookie = 'quarkus-credential=; Max-Age=0'
+        window.location.href = "/login";
+    }
+
+    const successAlert = "<div class=\"row alert alert-dismissible alert-success\">\n" +
+        "        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\"></button>\n" +
+        "        <strong>Transaction Created!</strong> Transaction has been created and stored in the database." +
+        "    </div>";
+    const errorAlert = "<div class=\"row alert alert-dismissible alert-danger\">\n" +
+        "        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\"></button>\n" +
+        "        <strong>Transaction Failed!</strong> Transaction failed to be created. Please check your inputs and try again." +
+        "    </div>";
+
+    function pushAlert(template) {
+        const alert = document.createElement('div');
+        alert.id = "alert-div";
+        alert.innerHTML = template;
+        if (document.getElementById("alert-div") != null) {
+            document.getElementById("alert-div").remove();
+        }
+        document.querySelector('.text-container').appendChild(alert);
+    }
+
+    function createTransaction() {
+        let symbol = document.getElementById('stock-input').value.toUpperCase();
+        let quantity = Math.ceil(document.getElementById('transaction-quantity').value);
+        let type = document.getElementById('transaction-type').value;
+        if (symbol === '' || quantity < 1) {
+            alert('Please enter a symbol and quantity');
+            return;
+        }
+        let Httpquote = new XMLHttpRequest();
+        let urlquote = window.location.origin + '/api/v1/users/quote?symbol=' + symbol;
+        Httpquote.open("GET", urlquote);
+        Httpquote.send();
+
+        Httpquote.onreadystatechange = (e) => {
+            if (Httpquote.readyState === 4 && Httpquote.status === 200) {
+                let quote = JSON.parse(Httpquote.responseText);
+                console.log(quote);
+                let price = quote.cost;
+                if (!confirm('Are you sure you want to ' + type + ' ' + quantity + ' shares of ' + symbol + ' for $' + price + ' per share?')) {
+                    return;
+                }
+                let Http = new XMLHttpRequest();
+                let url = window.location.origin + '/api/v1/users/transaction?symbol=' + symbol + '&amount=' + quantity + '&pricePu=' + price + '&tradeType=' + type;
+                Http.open("PUT", url);
+                Http.send();
+                Http.onreadystatechange = (e) => {
+                    if (Http.readyState === 4 && Http.status === 200) {
+                        pushAlert(successAlert);
+                        getUserStockInventory();
+                    } else if (Http.readyState === 4 && Http.status === 400) {
+                        pushAlert(errorAlert);
+                    }
+                }
+            } else if (Httpquote.readyState === 4 && (Httpquote.status === 422 || Httpquote.status === 500 || Httpquote.status === 400)) {
+                pushAlert(errorAlert);
+            }
+        }
+
+    }
+
+    function updateStockDisplay() {
+        let symbol = document.getElementById('stock-input').value.toUpperCase();
+        let Http = new XMLHttpRequest();
+        let url = window.location.origin + "/api/v1/users/quote?symbol=" + symbol
+        Http.open("GET", url);
+        Http.send();
+
+        Http.onreadystatechange = (e) => {
+            if (Http.status === 200) {
+                let data = JSON.parse(Http.responseText);
+                if (data.cost != null) {
+                    let tr = document.createElement('tr');
+                    tr.innerHTML = "<td>" + data.symbol + "</td><td>" + "$" + data.cost.toLocaleString('en-US') + "</td><td>" + "$" + data.change.toLocaleString('en-US') + "</td><td>" + data.percentChange.toString() + "%</td><td>" + "$" + data.high.toLocaleString('en-US') + "</td><td>" + "$" + data.low.toLocaleString('en-US') + "</td><td>" + "$" + data.dayOpen.toLocaleString('en-US') + "</td><td>" + "$" + data.previousClose.toLocaleString('en-US') + "</td>";
+                    document.getElementById("stock-lookup").innerHTML = "";
+                    document.getElementById("stock-lookup").appendChild(tr);
+                }
+            }
+        }
+    }
+
+    function getUserStockInventory() {
+        let Http = new XMLHttpRequest();
+        let url = window.location.origin + '/api/v1/users/me';
+        Http.open("GET", url);
+        Http.send();
+
+        Http.onreadystatechange = (e) => {
+            if (Http.readyState === 4 && Http.status === 200) {
+                let user = new User(JSON.parse(Http.responseText));
+                document.getElementById("user-balance").innerHTML = "$" + user.cash.toLocaleString('en-US');
+                document.getElementById("user-username").innerHTML = user.firstName;
+                let stockInventory = user.getStockInventory();
+                let stockTable = document.getElementById("stock-table");
+                stockTable.innerHTML = "";
+                for (let i = 0; i < stockInventory.length; i++) {
+                    let stock = stockInventory[i];
+                    let tr = document.createElement('tr');
+                    tr.innerHTML = "<td>" + stock.symbol + "</td><td>" + stock.amount + "</td>";
+                    stockTable.appendChild(tr);
+                }
+            }
+        }
+    }
+</script>
+</body>
+</html>
