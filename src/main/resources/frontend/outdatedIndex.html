@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stock Trading Home</title>
+</head>
+<body>
+<div style="text-align: center;">
+    <h3>JHS Mock Trading Home</h3>
+</div>
+<button onclick="logout()">Logout</button>
+<h3 id="welcome-message">Welcome name!</h3>
+<h3 id="user-cash">Cash: </h3>
+<label for="user-stock-inv" id="user-stock-inv-label">Stock Inventory</label>
+<table id="user-stock-inv">
+    <tr>
+        <th>Stock</th>
+        <th>Amount</th>
+    </tr>
+</table>
+<label for="stock-lookup" id="stock-lookup-label">Stock Lookup</label>
+<table id="stock-lookup">
+    <tr>
+        <th>Symbol</th>
+        <th>Cost</th>
+        <th>Change</th>
+        <th>Percent Change</th>
+        <th>High</th>
+        <th>Low</th>
+        <th>Open</th>
+        <th>Previous Close</th>
+    </tr>
+    <tr>
+        <th id="symbol">Symbol</th>
+        <th id="cost">Cost</th>
+        <th id="change">Change</th>
+        <th id="percent-change">Percent Change</th>
+        <th id="high">High</th>
+        <th id="low">Low</th>
+        <th id="open">Open</th>
+        <th id="close">Previous Close</th>
+    </tr>
+</table>
+<label for="symbol-input">Symbol:</label><input id="symbol-input" maxlength="8" placeholder="AAPL"/>
+<button onclick="updateStockDisplay(document.getElementById('symbol-input').value.toUpperCase())"
+        id="update-display-button">Update display
+</button>
+<div id="create-transaction-div">
+    <button onclick="showTransactionInputs()" id="show-transaction-button">Show Transaction Form</button>
+    <div id="transaction-inputs" style="display: none">
+        <label for="transaction-type">Transaction Type:</label>
+        <select id="transaction-type">
+            <option value="BUY">Buy</option>
+            <option value="SELL">Sell</option>
+        </select>
+        <label for="transaction-quantity">Quantity:</label><input id="transaction-quantity" type="number" min="1"
+                                                                  step="1" required/>
+        <button onclick="createTransaction()">Create Transaction</button>
+    </div>
+</div>
+<footer>
+    <a href="/admin" id="admin-page-footer-link" style="display: none">Admin Page</a>
+    <p>If you want to redesign this webpage, please contact me at: </p>
+    <a href="mailto: jordan.dooley@k12.nd.us">jordan.dooley@k12.nd.us</a>
+</footer>
+</body>
+<style>
+
+    label {
+        text-decoration: underline;
+    }
+
+    #user-cash {
+        color: green;
+    }
+
+    #update-display-button {
+        margin-left: 10px;
+    }
+
+    #create-transaction-div {
+        margin-top: 10px;
+    }
+
+    #show-transaction-button {
+        margin-bottom: 10px;
+    }
+
+    #stock-lookup {
+        margin-top: 5px;
+    }
+
+    #user-stock-inv {
+        margin-top: 5px;
+    }
+
+    table {
+        border: 2px solid black;
+        padding: 20px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    th {
+        border: 1px solid black;
+    }
+
+    footer {
+        position: relative;
+        bottom: 0;
+        width: 100%;
+        padding-bottom: 7px;
+    }
+
+    body {
+        background: #dddddd;
+    }
+
+</style>
+<script>
+
+    class User {
+
+        constructor(json) {
+            this.username = json.username;
+            this.firstName = json.firstName;
+            this.lastName = json.lastName;
+            this.email = json.email;
+            this.password = json.password;
+            this.cash = json.cash;
+            this.role = json.role;
+            this.transactions = json.transactions;
+            this.stockInventory = json.stocks;
+        }
+
+        getStockInventory() {
+            return this.stockInventory;
+        }
+    }
+
+    window.onload = getUserStockInventory;
+
+    function getUserStockInventory() {
+        let Http = new XMLHttpRequest();
+        let url = window.location.origin + '/api/v1/users/me';
+        Http.open("GET", url);
+        Http.send();
+
+        Http.onreadystatechange = (e) => {
+            let user = new User(JSON.parse(Http.responseText));
+            if (user.role === 'admin') {
+                document.getElementById('admin-page-footer-link').style.display = 'block';
+            }
+            document.getElementById('user-cash').innerText = 'Cash: $' + user.cash.toLocaleString("en-US");
+            document.getElementById('welcome-message').innerText = 'Welcome ' + user.firstName + '!';
+            let userStockInv = document.getElementById('user-stock-inv');
+            userStockInv.innerHTML = '<tr><th>Stock</th><th>Amount</th></tr>';
+            for (let i = 0; i < user.stockInventory.length; i++) {
+                let stock = user.getStockInventory()[i];
+                let row = userStockInv.insertRow();
+                let symbol = row.insertCell(0);
+                let amount = row.insertCell(1);
+                symbol.innerText = stock.symbol;
+                amount.innerText = stock.amount;
+            }
+        }
+    }
+
+    function createTransaction() {
+        let symbol = document.getElementById('symbol-input').value.toUpperCase();
+        let quantity = Math.ceil(document.getElementById('transaction-quantity').value);
+        let type = document.getElementById('transaction-type').value;
+        if (symbol === '' || quantity < 1) {
+            alert('Please enter a symbol and quantity');
+            return;
+        }
+        let Httpquote = new XMLHttpRequest();
+        let urlquote = window.location.origin + '/api/v1/users/quote?symbol=' + symbol;
+        Httpquote.open("GET", urlquote);
+        Httpquote.send();
+
+        Httpquote.onreadystatechange = (e) => {
+            if (Httpquote.readyState === 4 && Httpquote.status === 200) {
+                let quote = JSON.parse(Httpquote.responseText);
+                console.log(quote);
+                let price = quote.cost;
+                if (!confirm('Are you sure you want to ' + type + ' ' + quantity + ' shares of ' + symbol + ' for $' + price + ' per share?')) {
+                    return;
+                }
+                let Http = new XMLHttpRequest();
+                let url = window.location.origin + '/api/v1/users/transaction?symbol=' + symbol + '&amount=' + quantity + '&pricePu=' + price + '&tradeType=' + type;
+                Http.open("PUT", url);
+                Http.send();
+                Http.onreadystatechange = (e) => {
+                    if (Http.readyState === 4 && Http.status === 200) {
+                        alert('Transaction created successfully');
+                        getUserStockInventory();
+                    } else if (Http.readyState === 4 && Http.status === 400) {
+                        alert('Transaction failed: ' + Http.responseText);
+                    }
+                }
+            } else if (Httpquote.readyState === 4 && (Httpquote.status === 422 || Httpquote.status === 500 || Httpquote.status === 400)) {
+                alert('Transaction failed: ' + Httpquote.responseText);
+            }
+        }
+
+    }
+
+    function showTransactionInputs() {
+        let transactionInputs = document.getElementById("transaction-inputs");
+        let transactionButton = document.getElementById("show-transaction-button");
+        if (transactionInputs.style.display === "none") {
+            transactionInputs.style.display = "block"
+            transactionButton.innerText = "Hide Transaction Form";
+        } else {
+            transactionInputs.style.display = "none";
+            transactionButton.innerText = "Show Transaction Form";
+        }
+    }
+
+    function updateStockDisplay(symbol) {
+        let Http = new XMLHttpRequest();
+        let url = window.location.origin + "/api/v1/users/quote?symbol=" + symbol
+        Http.open("GET", url);
+        Http.send();
+
+        Http.onreadystatechange = (e) => {
+            if (Http.status === 200) {
+                let data = JSON.parse(Http.responseText);
+                console.log(data);
+                if (data.cost != null) {
+                    document.getElementById("symbol").textContent = data.symbol;
+                    document.getElementById("cost").textContent = "$" + data.cost.toLocaleString('en-US');
+                    document.getElementById("change").textContent = "$" + data.change.toLocaleString('en-US');
+                    document.getElementById("percent-change").textContent = +data.percentChange.toString() + "%";
+                    document.getElementById("high").textContent = "$" + data.high.toLocaleString('en-US');
+                    document.getElementById("low").textContent = "$" + data.low.toLocaleString('en-US');
+                    document.getElementById("open").textContent = "$" + data.dayOpen.toLocaleString('en-US');
+                    document.getElementById("close").textContent = "$" + data.previousClose.toLocaleString('en-US');
+                }
+            }
+        }
+    }
+
+    function logout() {
+        document.cookie = 'quarkus-credential=; Max-Age=0'
+        window.location.href = "/login";
+    }
+</script>
+</html>

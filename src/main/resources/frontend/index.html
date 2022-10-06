@@ -1,123 +1,140 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Stock Trading Home</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mock Trading</title>
+    <link href="/darkmode.css" rel="stylesheet">
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
+            crossorigin="anonymous"></script>
 </head>
 <body>
-<div style="text-align: center;">
-    <h3>JHS Mock Trading Home</h3>
-</div>
-<button onclick="logout()">Logout</button>
-<h3 id="welcome-message">Welcome name!</h3>
-<h3 id="user-cash">Cash: </h3>
-<label for="user-stock-inv" id="user-stock-inv-label">Stock Inventory</label>
-<table id="user-stock-inv">
-    <tr>
-        <th>Stock</th>
-        <th>Amount</th>
-    </tr>
-</table>
-<label for="stock-lookup" id="stock-lookup-label">Stock Lookup</label>
-<table id="stock-lookup">
-    <tr>
-        <th>Symbol</th>
-        <th>Cost</th>
-        <th>Change</th>
-        <th>Percent Change</th>
-        <th>High</th>
-        <th>Low</th>
-        <th>Open</th>
-        <th>Previous Close</th>
-    </tr>
-    <tr>
-        <th id="symbol">Symbol</th>
-        <th id="cost">Cost</th>
-        <th id="change">Change</th>
-        <th id="percent-change">Percent Change</th>
-        <th id="high">High</th>
-        <th id="low">Low</th>
-        <th id="open">Open</th>
-        <th id="close">Previous Close</th>
-    </tr>
-</table>
-<label for="symbol-input">Symbol:</label><input id="symbol-input" maxlength="8" placeholder="AAPL"/>
-<button onclick="updateStockDisplay(document.getElementById('symbol-input').value.toUpperCase())"
-        id="update-display-button">Update display
-</button>
-<div id="create-transaction-div">
-    <button onclick="showTransactionInputs()" id="show-transaction-button">Show Transaction Form</button>
-    <div id="transaction-inputs" style="display: none">
-        <label for="transaction-type">Transaction Type:</label>
-        <select id="transaction-type">
-            <option value="BUY">Buy</option>
-            <option value="SELL">Sell</option>
-        </select>
-        <label for="transaction-quantity">Quantity:</label><input id="transaction-quantity" type="number" min="1"
-                                                                  step="1" required/>
-        <button onclick="createTransaction()">Create Transaction</button>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand" href="#">Mock Trading</a>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="mailto:jordan.dooley@k12.nd.us">Contact Me</a>
+            </ul>
+        </div>
+        <ul class="navbar-nav mb-2 mb-lg-0">
+            <li class="navbar-brand" id="user-username">NAME</li>
+            <li class="navbar-brand text-success" id="user-balance">$50,000</li>
+            <li>
+                <button class="btn btn-outline-success" type="submit" onclick="logout()">Logout</button>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div class="container text-container">
+    <div class="row justify-content-between">
+        <div class="col-4 text-center card border-success">
+            <div class="card-header">
+                <h4>Stock Inventory</h4>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th scope="col">Stock</th>
+                        <th scope="col">Amount</th>
+                        <th scope="col">Net Value</th>
+                    </tr>
+                    </thead>
+                    <tbody id="stock-table">
+                    <tr>
+                        <td>Example 1</td>
+                        <td>10</td>
+                        <td>$100</td>
+                    </tr>
+                    <tr>
+                        <td>Example 2</td>
+                        <td>20</td>
+                        <td>$200</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col">
+            <div class="col text-center card border-info">
+                <div class="card-header">
+                    <h4>Stock Lookup</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                        <tr>
+                            <th scope="col">Symbol</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Change</th>
+                            <th scope="col">Percent Change</th>
+                            <th scope="col">High</th>
+                            <th scope="col">Low</th>
+                            <th scope="col">Open</th>
+                            <th scope="col">Previous Close</th>
+                        </tr>
+                        </thead>
+                        <tbody id="stock-lookup">
+                        <tr>
+                            <td>Example</td>
+                            <td>$100</td>
+                            <td>$10</td>
+                            <td>10%</td>
+                            <td>$110</td>
+                            <td>$90</td>
+                            <td>$105</td>
+                            <td>$90</td>
+                    </table>
+                    <div class="d-flex">
+                        <button class="btn btn-outline-success me-2" type="submit" onclick="updateStockDisplay()">
+                            Search
+                        </button>
+                        <input class="form-control" id="stock-input" type="search" placeholder="AAPL"
+                               aria-label="Search"/>
+                    </div>
+                </div>
+            </div>
+            <div class="col text-white card border-warning">
+                <div class="card-header">
+                    <h4 class="text-center">Transaction Form</h4>
+                </div>
+                <div class="card-body">
+                    Do you want to buy or sell?
+                    <select class="form-select" id="transaction-type" aria-label="Default select example">
+                        <option selected value="BUY">Buy</option>
+                        <option value="SELL">Sell</option>
+                    </select>
+                    How many shares?
+                    <div class="input-group mb-3">
+                        <input type="number" id="transaction-quantity" class="form-control" value="1"
+                               min="1"
+                               step="1"
+                               aria-label="Username" aria-describedby="basic-addon1">
+                        <button class="btn btn-outline-success" type="submit" onclick="createTransaction()">Create
+                            Transaction
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-<footer>
-    <a href="/admin" id="admin-page-footer-link" style="display: none">Admin Page</a>
-    <p>If you want to redesign this webpage, please contact me at: </p>
-    <a href="mailto: jordan.dooley@k12.nd.us">jordan.dooley@k12.nd.us</a>
-</footer>
-</body>
-<style>
-
-    label {
-        text-decoration: underline;
-    }
-
-    #user-cash {
-        color: green;
-    }
-
-    #update-display-button {
-        margin-left: 10px;
-    }
-
-    #create-transaction-div {
-        margin-top: 10px;
-    }
-
-    #show-transaction-button {
-        margin-bottom: 10px;
-    }
-
-    #stock-lookup {
-        margin-top: 5px;
-    }
-
-    #user-stock-inv {
-        margin-top: 5px;
-    }
-
-    table {
-        border: 2px solid black;
-        padding: 20px;
-        margin-top: 10px;
-        margin-bottom: 10px;
-    }
-
-    th {
-        border: 1px solid black;
-    }
-
-    footer {
-        position: relative;
-        bottom: 0;
-        width: 100%;
-        padding-bottom: 7px;
-    }
-
-    body {
-        background: #dddddd;
-    }
-
-</style>
 <script>
+    window.onload = function () {
+        getUserStockInventory();
+        pushAlert(infoAlert)
+    };
 
     class User {
 
@@ -138,36 +155,38 @@
         }
     }
 
-    window.onload = getUserStockInventory;
+    function logout() {
+        document.cookie = 'quarkus-credential=; Max-Age=0'
+        window.location.href = "/login";
+    }
 
-    function getUserStockInventory() {
-        let Http = new XMLHttpRequest();
-        let url = window.location.origin + '/api/v1/users/me';
-        Http.open("GET", url);
-        Http.send();
+    const infoAlert = "<div class=\"row alert alert-dismissible alert-info fade show\" role=\"alert\">\n" +
+        "        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button>\n" +
+        "        <strong>New Feature!</strong> You can click on the stocks in your inventory! This will automatically look up the current stock price and calculate value of your current holdings!" +
+        "    </div>";
 
-        Http.onreadystatechange = (e) => {
-            let user = new User(JSON.parse(Http.responseText));
-            if (user.role === 'admin') {
-                document.getElementById('admin-page-footer-link').style.display = 'block';
-            }
-            document.getElementById('user-cash').innerText = 'Cash: $' + user.cash.toLocaleString("en-US");
-            document.getElementById('welcome-message').innerText = 'Welcome ' + user.firstName + '!';
-            let userStockInv = document.getElementById('user-stock-inv');
-            userStockInv.innerHTML = '<tr><th>Stock</th><th>Amount</th></tr>';
-            for (let i = 0; i < user.stockInventory.length; i++) {
-                let stock = user.stockInventory[i];
-                let row = userStockInv.insertRow();
-                let symbol = row.insertCell(0);
-                let amount = row.insertCell(1);
-                symbol.innerText = stock.symbol;
-                amount.innerText = stock.amount;
-            }
+    const successAlert = "<div class=\"row alert alert-dismissible alert-success fade show\" role=\"alert\">\n" +
+        "        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button>\n" +
+        "        <strong>Transaction Created!</strong> Transaction has been created and stored in the database." +
+        "    </div>";
+    const errorAlert = "<div class=\"row alert alert-dismissible alert-danger fade show\" role=\"alert\">\n" +
+        "        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button>\n" +
+        "        <strong>Transaction Failed!</strong> Transaction failed to be created. Please check your inputs and try again." +
+        "    </div>";
+
+    function pushAlert(template) {
+        const alert = document.createElement('div');
+        alert.id = "alert-div";
+        alert.innerHTML = template;
+        alert.classList.add("mt-2");
+        if (document.getElementById("alert-div") != null) {
+            document.getElementById("alert-div").remove();
         }
+        document.querySelector('.text-container').appendChild(alert);
     }
 
     function createTransaction() {
-        let symbol = document.getElementById('symbol-input').value.toUpperCase();
+        let symbol = document.getElementById('stock-input').value.toUpperCase();
         let quantity = Math.ceil(document.getElementById('transaction-quantity').value);
         let type = document.getElementById('transaction-type').value;
         if (symbol === '' || quantity < 1) {
@@ -182,7 +201,6 @@
         Httpquote.onreadystatechange = (e) => {
             if (Httpquote.readyState === 4 && Httpquote.status === 200) {
                 let quote = JSON.parse(Httpquote.responseText);
-                console.log(quote);
                 let price = quote.cost;
                 if (!confirm('Are you sure you want to ' + type + ' ' + quantity + ' shares of ' + symbol + ' for $' + price + ' per share?')) {
                     return;
@@ -193,32 +211,21 @@
                 Http.send();
                 Http.onreadystatechange = (e) => {
                     if (Http.readyState === 4 && Http.status === 200) {
-                        alert('Transaction created successfully');
+                        pushAlert(successAlert);
                         getUserStockInventory();
                     } else if (Http.readyState === 4 && Http.status === 400) {
-                        alert('Transaction failed: ' + Http.responseText);
+                        pushAlert(errorAlert);
                     }
                 }
             } else if (Httpquote.readyState === 4 && (Httpquote.status === 422 || Httpquote.status === 500 || Httpquote.status === 400)) {
-                alert('Transaction failed: ' + Httpquote.responseText);
+                pushAlert(errorAlert);
             }
         }
 
     }
 
-    function showTransactionInputs() {
-        let transactionInputs = document.getElementById("transaction-inputs");
-        let transactionButton = document.getElementById("show-transaction-button");
-        if (transactionInputs.style.display === "none") {
-            transactionInputs.style.display = "block"
-            transactionButton.innerText = "Hide Transaction Form";
-        } else {
-            transactionInputs.style.display = "none";
-            transactionButton.innerText = "Show Transaction Form";
-        }
-    }
-
-    function updateStockDisplay(symbol) {
+    function updateStockDisplay(amount = 0) {
+        let symbol = document.getElementById('stock-input').value.toUpperCase();
         let Http = new XMLHttpRequest();
         let url = window.location.origin + "/api/v1/users/quote?symbol=" + symbol
         Http.open("GET", url);
@@ -227,24 +234,48 @@
         Http.onreadystatechange = (e) => {
             if (Http.status === 200) {
                 let data = JSON.parse(Http.responseText);
-                console.log(data);
                 if (data.cost != null) {
-                    document.getElementById("symbol").textContent = data.symbol;
-                    document.getElementById("cost").textContent = "$" + data.cost.toLocaleString('en-US');
-                    document.getElementById("change").textContent = "$" + data.change.toLocaleString('en-US');
-                    document.getElementById("percent-change").textContent = +data.percentChange.toString() + "%";
-                    document.getElementById("high").textContent = "$" + data.high.toLocaleString('en-US');
-                    document.getElementById("low").textContent = "$" + data.low.toLocaleString('en-US');
-                    document.getElementById("open").textContent = "$" + data.dayOpen.toLocaleString('en-US');
-                    document.getElementById("close").textContent = "$" + data.previousClose.toLocaleString('en-US');
+                    let tr = document.createElement('tr');
+                    tr.innerHTML = "<td>" + data.symbol + "</td><td>" + "$" + data.cost.toLocaleString('en-US') + "</td><td id='stock-change'>" + "$" + data.change.toLocaleString('en-US') + "</td><td id='stock-percent-change'>" + data.percentChange.toString() + "%</td><td>" + "$" + data.high.toLocaleString('en-US') + "</td><td>" + "$" + data.low.toLocaleString('en-US') + "</td><td>" + "$" + data.dayOpen.toLocaleString('en-US') + "</td><td>" + "$" + data.previousClose.toLocaleString('en-US') + "</td>";
+                    document.getElementById("stock-lookup").innerHTML = "";
+                    document.getElementById("stock-lookup").appendChild(tr);
+                    let color = data.change > 0 ? "limegreen" : "red";
+                    document.getElementById('stock-change').style.color = color;
+                    document.getElementById('stock-percent-change').style.color = color;
+                    document.getElementById(data.symbol + "-net").textContent = "$" + (data.cost * amount).toLocaleString('en-US');
                 }
             }
         }
     }
 
-    function logout() {
-        document.cookie = 'quarkus-credential=; Max-Age=0'
-        window.location.href = "/login";
+    function getUserStockInventory() {
+        let Http = new XMLHttpRequest();
+        let url = window.location.origin + '/api/v1/users/me';
+        Http.open("GET", url);
+        Http.send();
+
+        Http.onreadystatechange = (e) => {
+            if (Http.readyState === 4 && Http.status === 200) {
+                let user = new User(JSON.parse(Http.responseText));
+                document.getElementById("user-balance").innerHTML = "$" + user.cash.toLocaleString('en-US');
+                document.getElementById("user-username").innerHTML = user.firstName;
+                let stockInventory = user.getStockInventory();
+                let stockTable = document.getElementById("stock-table");
+                stockTable.innerHTML = "";
+                for (let i = 0; i < stockInventory.length; i++) {
+                    let stock = stockInventory[i];
+                    let tr = document.createElement('tr');
+
+                    tr.onclick = function () {
+                        document.getElementById('stock-input').value = stock.symbol;
+                        updateStockDisplay(stock.amount);
+                    }
+                    tr.innerHTML = "<td>" + stock.symbol + "</td><td>" + stock.amount + "</td><td id=\'" + stock.symbol + "-net" + "\'>$0</td>";
+                    stockTable.appendChild(tr);
+                }
+            }
+        }
     }
 </script>
+</body>
 </html>

@@ -2,80 +2,168 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Register</title>
+    <title>Mock Trading Register
+    </title>
+    <link href="/darkmode.css" rel="stylesheet">
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
+            crossorigin="anonymous"></script>
 </head>
 <body>
-
-<div style="text-align: center;">
-    <h3>JHS Mock Trading Registration</h3>
-</div>
-<div>
-    <label for="username"><b>Username</b></label>
-    <input type="text" placeholder="Enter Username" name="username" id="username"
-           pattern="^(?=[a-zA-Z0-9._]{3,20}$)(?!.*[_.]{2})[^_.].*[^_.]$" required>
-
-    <label for="firstName"><b>First Name</b></label>
-    <input type="text" placeholder="Enter First Name" name="firstName" id="firstName" required>
-
-    <label for="lastName"><b>Last Name</b></label>
-    <input type="text" placeholder="Enter Last Name" name="lastName" id="lastName" required>
-
-    <label for="email"><b>Email</b></label>
-    <input type="text" placeholder="Enter Email" name="email" id="email" pattern="^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$"
-           required>
-
-    <label for="password"><b>Password</b></label>
-    <input type="password" placeholder="Enter Password" name="password" id="password" pattern="^\w(\w|[!@#$%*]){4,32}"
-           required>
-
-    <label for="passwordValidate"><b>Confirm Password</b></label>
-    <input type="password" placeholder="Confirm Password" name="passwordValidate" id="passwordValidate"
-           pattern="^\w(\w|[!@#$%*]){4,32}" required>
-    <div id="password-parameter" style="margin-bottom: 10px; margin-top: 10px;">
-        <p>Password must be between 5 and 32 characters long</p>
-        <p>Passwords can contain letters, numbers, and these special characters: ! @ # $ % *</p>
+<div class="d-flex justify-content-center row row-cols-1 text-center">
+    <h3>Mock Trading Register</h3>
+    <div class="card border-info col-5">
+        <div class="card-body">
+            <h5 class="card-title">Mock Trading</h5>
+            <p class="card-text">Usernames can only have letters, numbers, a period or underscore, and between 3 and 20 characters.</p>
+            <p class="card-text">Passwords must be 4 to 32 characters long and can contain letters, numbers, and these special characters: ! @ # $ % *</p>
+        </div>
     </div>
-    <p id="mismatchedPasswordLabel" style="display: none">Passwords do not match!</p>
+    <div class="card col-5">
 
-    <button id="register-button" onclick="verifyInfo()">Register</button>
+        <div class="row mt-2">
+            <div class="form-outline col">
+                <input type="text" id="first-name" name="first-name" class="form-control" required/>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+                <div class="invalid-feedback">
+                    Please enter your first name.
+                </div>
+                <label class="form-label" for="first-name">First Name</label>
+            </div>
 
+            <div class="form-outline col">
+                <input type="text" id="last-name" name="last-name" class="form-control" required/>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+                <div class="invalid-feedback">
+                    Please enter your last name.
+                </div>
+                <label class="form-label" for="last-name">Last Name</label>
+            </div>
+        </div>
+
+        <div class="row my-4">
+            <div class="form-outline col">
+                <input type="text" id="username" name="username" class="form-control" required/>
+                <div class="valid-feedback">
+                    Username available!
+                </div>
+                <div class="invalid-feedback">
+                    Username taken or invalid!
+                </div>
+                <label class="form-label" for="username">Username</label>
+            </div>
+            <div class="form-outline col">
+                <input type="text" id="email" name="email" class="form-control" required/>
+                <div class="valid-feedback">
+                    Email not in use!
+                </div>
+                <div class="invalid-feedback">
+                    Email in use or invalid!
+                </div>
+                <label class="form-label" for="email">Email</label>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-outline col">
+                <input type="password" id="password" name="password" class="form-control" required/>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+                <div class="invalid-feedback">
+                    Password invalid!
+                </div>
+                <label class="form-label" for="password">Password</label>
+            </div>
+            <div class="form-outline col">
+                <input type="password" id="confirm-password" name="confirm-password" class="form-control" required/>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+                <div class="invalid-feedback">
+                    Passwords do not match!
+                </div>
+                <label class="form-label" for="confirm-password">Confirm Password</label>
+            </div>
+        </div>
+
+        <button type="submit" onclick="verifyInfo()" class="btn btn-primary btn-block mb-4">Sign in</button>
+
+        <div class="text-center">
+            <p>Already registered? <a href="/login">Login</a></p>
+        </div>
+    </div>
 </div>
 </body>
-<style>
-    body {
-        background: #dddddd;
-    }
-</style>
 <script>
 
     let isUsernameValid = false;
     let isEmailValid = false;
 
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    const passwordRegex = /^\w(\w|[!@#$%*]){4,32}/;
+    const usernameRegex = /^(?=[a-zA-Z0-9._]{3,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/;
+
+    function verifyNames() {
+        const firstName = document.getElementById("first-name").value;
+        const lastName = document.getElementById("last-name").value;
+        if (firstName.length > 0) {
+            document.getElementById("first-name").classList.remove("is-invalid");
+            document.getElementById("first-name").classList.add("is-valid");
+        } else {
+            document.getElementById("first-name").classList.remove("is-valid");
+            document.getElementById("first-name").classList.add("is-invalid");
+            return false;
+        }
+        if (lastName.length > 0) {
+            document.getElementById("last-name").classList.remove("is-invalid");
+            document.getElementById("last-name").classList.add("is-valid");
+        } else {
+            document.getElementById("last-name").classList.remove("is-valid");
+            document.getElementById("last-name").classList.add("is-invalid");
+            return false;
+        }
+        return true;
+    }
+
     function verifyInfo() {
 
         console.log("Verifying info...");
 
+        if (!verifyNames()) {
+            return;
+        }
+
         if (!isUsernameValid) return false;
 
-        console.log("Username is valid");
+        console.log("Username valid!");
 
         if (!isEmailValid) return false;
 
-        console.log("Email is valid");
+        console.log("Email valid!");
 
         let password = document.getElementById("password").value;
-        let passwordValidate = document.getElementById("passwordValidate").value;
+        let passwordValidate = document.getElementById("confirm-password").value;
         if (password !== passwordValidate) {
-            document.getElementById("mismatchedPasswordLabel").style.display = "block";
+            document.getElementById("confirm-password").classList.remove("is-valid");
+            document.getElementById("confirm-password").classList.add("is-invalid");
             return false;
+        } else {
+            document.getElementById("confirm-password").classList.remove("is-invalid");
+            document.getElementById("confirm-password").classList.add("is-valid");
         }
 
-        console.log("Passwords match");
+        console.log("Passwords match!");
 
         let Http = new XMLHttpRequest();
         let url = window.location.origin + '/api/v1/users/create?username=' + document.getElementById("username").value
-            + '&firstName=' + document.getElementById("firstName").value + '&lastName='
-            + document.getElementById("lastName").value + '&email='
+            + '&firstName=' + document.getElementById("first-name").value + '&lastName='
+            + document.getElementById("last-name").value + '&email='
             + encodeURIComponent(document.getElementById("email").value) + '&password='
             + encodeURIComponent(document.getElementById("password").value);
         Http.open("POST", url);
@@ -95,6 +183,12 @@
     }
 
     function getUsernameAvailability() {
+        if (!usernameRegex.test(this.value)) {
+            document.getElementById("username").classList.remove("is-valid");
+            document.getElementById("username").classList.add("is-invalid");
+            isUsernameValid = false;
+            return;
+        }
         let Http = new XMLHttpRequest();
         let url = window.location.origin + "/api/v1/users/username-available?username=" + this.value;
         Http.open("GET", url);
@@ -104,13 +198,13 @@
             if (Http.readyState === 4) {
                 if (Http.status === 200) {
                     if (Http.responseText === "true") {
-                        this.style.backgroundColor = "lightgreen";
+                        document.getElementById("username").classList.remove("is-invalid");
+                        document.getElementById("username").classList.add("is-valid");
                         isUsernameValid = true;
-                        console.log("Username is available");
                     } else {
-                        this.style.backgroundColor = "#FF6666";
+                        document.getElementById("username").classList.remove("is-valid");
+                        document.getElementById("username").classList.add("is-invalid");
                         isUsernameValid = false;
-                        console.log("Username is not available");
                     }
                 } else {
                     console.log("Error: " + Http.responseText);
@@ -119,36 +213,40 @@
         }
     }
 
+    document.getElementById("last-name").addEventListener("input", verifyNames);
+
     document.getElementById("username").addEventListener("input", getUsernameAvailability);
 
     document.getElementById("password").addEventListener("change", function () {
         this.value = this.value.trim();
-        if (!/^\w(\w|[!@#$%*]){4,32}/.test(this.value)) {
-            this.style.backgroundColor = "#FF6666";
+        if (!passwordRegex.test(this.value)) {
+            this.classList.remove("is-valid");
+            this.classList.add("is-invalid");
         } else {
-            this.style.backgroundColor = "lightgreen";
+            this.classList.remove("is-invalid");
+            this.classList.add("is-valid");
             checkPasswordMatch();
         }
     });
 
     function checkPasswordMatch() {
-        if (document.getElementById("password").value !== document.getElementById("passwordValidate").value) {
-            document.getElementById("mismatchedPasswordLabel").style.display = "block";
-            document.getElementById("passwordValidate").style.backgroundColor = "#FF6666";
+        if (document.getElementById("password").value !== document.getElementById("confirm-password").value) {
+            document.getElementById("confirm-password").classList.remove("is-valid");
+            document.getElementById("confirm-password").classList.add("is-invalid");
         } else {
-            document.getElementById("mismatchedPasswordLabel").style.display = "none";
-            document.getElementById("passwordValidate").style.backgroundColor = "lightgreen";
+            document.getElementById("confirm-password").classList.remove("is-invalid");
+            document.getElementById("confirm-password").classList.add("is-valid");
         }
     }
 
-    document.getElementById("passwordValidate").addEventListener("change", checkPasswordMatch);
+    document.getElementById("confirm-password").addEventListener("change", checkPasswordMatch);
 
     document.getElementById("email").addEventListener("input", function () {
-        let validFormat = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(this.value);
+        let validFormat = emailRegex.test(this.value);
         if (!validFormat) {
-            this.style.backgroundColor = "#FF6666";
+            this.classList.remove("is-valid");
+            this.classList.add("is-invalid");
             isEmailValid = false;
-            console.log("Email is not valid");
             return;
         }
         let Http = new XMLHttpRequest();
@@ -160,13 +258,13 @@
             if (Http.readyState === 4) {
                 if (Http.status === 200) {
                     if (Http.responseText === "true") {
-                        this.style.backgroundColor = "lightgreen";
+                        this.classList.remove("is-invalid");
+                        this.classList.add("is-valid");
                         isEmailValid = true;
-                        console.log("Email is available");
                     } else {
-                        this.style.backgroundColor = "#FF6666";
+                        this.classList.remove("is-valid");
+                        this.classList.add("is-invalid");
                         isEmailValid = false;
-                        console.log("Email is not available");
                     }
                 } else {
                     console.log("Error: " + Http.responseText);
@@ -174,6 +272,5 @@
             }
         }
     });
-
 </script>
 </html>

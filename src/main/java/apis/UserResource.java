@@ -155,7 +155,7 @@ public class UserResource {
         stockEntity.persist();
         UserEntity userEntity = userEntityDao.findByUsername(securityContext.getUserPrincipal().getName());
         List<StockEntity> userInv = userEntity.stocks;
-        StockEntity requestedStock = userInv.stream().filter((s -> Objects.equals(s.symbol, symbol))).collect(Collectors.toList()).stream().findFirst().orElse(null);
+        StockEntity requestedStock = userInv.stream().filter((s -> Objects.equals(s.symbol, symbol))).findFirst().orElse(null);
         if (tradeType == TradeType.BUY) {
             if (userEntity.cash < amount * price) {
                 throw HttpProblem.builder()
