@@ -6,8 +6,6 @@ import io.vertx.ext.web.handler.StaticHandler;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.ApplicationScoped;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.SecurityContext;
 
 @ApplicationScoped
 public class StaticContent {
@@ -29,11 +27,11 @@ public class StaticContent {
         StaticHandler.create(FileSystemAccess.RELATIVE, "frontend/admin.html").handle(rc);
     }
 
-    @PermitAll
-    @Route(path = "/test", methods = Route.HttpMethod.GET)
-    void testContent(RoutingContext rc) {
-        StaticHandler.create(FileSystemAccess.RELATIVE, "frontend/test.html").handle(rc);
-    }
+//    @PermitAll
+//    @Route(path = "/test", methods = Route.HttpMethod.GET)
+//    void testContent(RoutingContext rc) {
+//        StaticHandler.create(FileSystemAccess.RELATIVE, "frontend/test.html").handle(rc);
+//    }
 
     @PermitAll
     @Route(path = "/darkmode.css", methods = Route.HttpMethod.GET)
