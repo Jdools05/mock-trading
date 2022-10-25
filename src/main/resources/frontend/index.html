@@ -25,6 +25,10 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="mailto:jordan.dooley@k12.nd.us">Contact Me</a>
+                </li>
+                <li class="nav-item hiding" id="admin-link">
+                    <a class="nav-link" href="/admin">Admin</a>
+                </li>
             </ul>
         </div>
         <ul class="navbar-nav mb-2 mb-lg-0">
@@ -140,6 +144,24 @@
         pushAlert(infoAlert)
     };
 
+    function handleRequest(method, url, body, callback) {
+        let xhr = new XMLHttpRequest();
+        xhr.open(method, url);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    callback(xhr.responseText);
+                } else if (xhr.status === 401 || xhr.status === 403) {
+                    window.location.href = "/login";
+                } else {
+                    pushAlert(errorAlert);
+                }
+            }
+        };
+        xhr.send(body);
+    }
+
     class User {
 
         constructor(json) {
@@ -197,88 +219,71 @@
             alert('Please enter a symbol and quantity');
             return;
         }
-        let Httpquote = new XMLHttpRequest();
-        let urlquote = window.location.origin + '/api/v1/users/quote?symbol=' + symbol;
-        Httpquote.open("GET", urlquote);
-        Httpquote.send();
 
-        Httpquote.onreadystatechange = (e) => {
-            if (Httpquote.readyState === 4 && Httpquote.status === 200) {
-                let quote = JSON.parse(Httpquote.responseText);
-                let price = quote.cost;
-                if (!confirm('Are you sure you want to ' + type + ' ' + quantity + ' shares of ' + symbol + ' for $' + price + ' per share?')) {
-                    return;
-                }
-                let Http = new XMLHttpRequest();
-                let url = window.location.origin + '/api/v1/users/transaction?symbol=' + symbol + '&amount=' + quantity + '&pricePu=' + price + '&tradeType=' + type;
-                Http.open("PUT", url);
-                Http.send();
-                Http.onreadystatechange = (e) => {
-                    if (Http.readyState === 4 && Http.status === 200) {
-                        pushAlert(successAlert);
-                        getUserStockInventory();
-                    } else if (Http.readyState === 4 && Http.status === 400) {
-                        pushAlert(errorAlert);
-                    }
-                }
-            } else if (Httpquote.readyState === 4 && (Httpquote.status === 422 || Httpquote.status === 500 || Httpquote.status === 400)) {
-                pushAlert(errorAlert);
+        let urlquote = window.location.origin + "/api/v1/users/quote?symbol=" + symbol;
+        handleRequest('GET', urlquote, null, function (data) {
+            let quote = JSON.parse(data);
+            let price = quote.cost;
+            if (!confirm('Are you sure you want to ' + type + ' ' + quantity + ' shares of ' + symbol + ' for $' + price + ' per share?')) {
+                return;
             }
-        }
-
+            let url = window.location.origin + '/api/v1/users/transaction?symbol=' + symbol + '&amount=' + quantity + '&pricePu=' + price + '&tradeType=' + type;
+            handleRequest('PUT', url, null, function (data) {
+                pushAlert(successAlert);
+                getUserStockInventory();
+            });
+        });
     }
 
     function updateStockDisplay(amount = 0) {
         let symbol = document.getElementById('stock-input').value.toUpperCase();
-        let Http = new XMLHttpRequest();
         let url = window.location.origin + "/api/v1/users/quote?symbol=" + symbol
-        Http.open("GET", url);
-        Http.send();
-
-        Http.onreadystatechange = (e) => {
-            if (Http.status === 200) {
-                let data = JSON.parse(Http.responseText);
-                if (data.cost != null) {
-                    let tr = document.createElement('tr');
-                    tr.innerHTML = "<td>" + data.symbol + "</td><td>" + "$" + data.cost.toLocaleString('en-US') + "</td><td id='stock-change'>" + "$" + data.change.toLocaleString('en-US') + "</td><td id='stock-percent-change'>" + data.percentChange.toString() + "%</td><td>" + "$" + data.high.toLocaleString('en-US') + "</td><td>" + "$" + data.low.toLocaleString('en-US') + "</td><td>" + "$" + data.dayOpen.toLocaleString('en-US') + "</td><td>" + "$" + data.previousClose.toLocaleString('en-US') + "</td>";
-                    document.getElementById("stock-lookup").innerHTML = "";
-                    document.getElementById("stock-lookup").appendChild(tr);
-                    let color = data.change > 0 ? "limegreen" : "red";
-                    document.getElementById('stock-change').style.color = color;
-                    document.getElementById('stock-percent-change').style.color = color;
-                    document.getElementById(data.symbol + "-net").textContent = "$" + (data.cost * amount).toLocaleString('en-US');
-                }
-            }
+        if (symbol === '') {
+            alert('Please enter a symbol');
+            return;
         }
+        handleRequest('GET', url, null, function (data) {
+            let quote = JSON.parse(data);
+            if (quote.cost != null) {
+                let tr = document.createElement('tr');
+                tr.innerHTML = "<td>" + quote.symbol + "</td><td>" + "$" + quote.cost.toLocaleString('en-US') + "</td><td id='stock-change'>" + "$" + quote.change.toLocaleString('en-US') + "</td><td id='stock-percent-change'>" + quote.percentChange.toString() + "%</td><td>" + "$" + quote.high.toLocaleString('en-US') + "</td><td>" + "$" + quote.low.toLocaleString('en-US') + "</td><td>" + "$" + quote.dayOpen.toLocaleString('en-US') + "</td><td>" + "$" + quote.previousClose.toLocaleString('en-US') + "</td>";
+                document.getElementById("stock-lookup").innerHTML = "";
+                document.getElementById("stock-lookup").appendChild(tr);
+                let color = quote.change > 0 ? "limegreen" : "red";
+                document.getElementById('stock-change').style.color = color;
+                document.getElementById('stock-percent-change').style.color = color;
+                document.getElementById(quote.symbol + "-net").textContent = "$" + (quote.cost * amount).toLocaleString('en-US');
+            }
+        });
     }
 
     function getUserStockInventory() {
-        let Http = new XMLHttpRequest();
         let url = window.location.origin + '/api/v1/users/me';
-        Http.open("GET", url);
-        Http.send();
-
-        Http.onreadystatechange = (e) => {
-            if (Http.readyState === 4 && Http.status === 200) {
-                let user = new User(JSON.parse(Http.responseText));
-                document.getElementById("user-balance").innerHTML = "$" + user.cash.toLocaleString('en-US');
-                document.getElementById("user-username").innerHTML = user.firstName;
-                let stockInventory = user.getStockInventory();
-                let stockTable = document.getElementById("stock-table");
-                stockTable.innerHTML = "";
-                for (let i = 0; i < stockInventory.length; i++) {
-                    let stock = stockInventory[i];
-                    let tr = document.createElement('tr');
-
-                    tr.onclick = function () {
-                        document.getElementById('stock-input').value = stock.symbol;
-                        updateStockDisplay(stock.amount);
-                    }
-                    tr.innerHTML = "<td>" + stock.symbol + "</td><td>" + stock.amount + "</td><td id=\'" + stock.symbol + "-net" + "\'>$0</td>";
-                    stockTable.appendChild(tr);
+        handleRequest('GET', url, null, function (data) {
+            let user = new User(JSON.parse(data));
+            let inventory = user.getStockInventory();
+            let table = document.getElementById("stock-table");
+            table.innerHTML = "";
+            let name = document.getElementById("user-username");
+            name.textContent = user.firstName
+            let cash = document.getElementById("user-balance");
+            cash.textContent = "$" + user.cash.toLocaleString('en-US');
+            for (let i = 0; i < inventory.length; i++) {
+                let tr = document.createElement('tr');
+                tr.innerHTML = "<td>" + inventory[i].symbol + "</td><td>" + inventory[i].amount + "</td><td id='" + inventory[i].symbol + "-net'>" + "$" + (inventory[i].costPer * inventory[i].amount).toLocaleString('en-US') + "</td>";
+                table.appendChild(tr);
+                tr.addEventListener('click', function () {
+                    document.getElementById('stock-input').value = inventory[i].symbol;
+                    updateStockDisplay(inventory[i].amount);
+                });
+                let net = inventory[i].costPer * inventory[i].amount;
+                if (isNaN(net)) {
+                    net = 0;
                 }
+                document.getElementById(inventory[i].symbol + '-net').textContent = "$" + net.toLocaleString('en-US');
             }
-        }
+        });
+
     }
 </script>
 </body>

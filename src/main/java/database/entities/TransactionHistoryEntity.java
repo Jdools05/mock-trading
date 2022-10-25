@@ -13,9 +13,11 @@ public class TransactionHistoryEntity extends PanacheEntity {
     @Column(name = "timestamp")
     public LocalDateTime timestamp;
 
-    @JoinColumn(name = "stock")
-    @OneToOne
-    public StockEntity stock;
+    @Column(name = "stock_symbol")
+    public String stockSymbol;
+
+    @Column(name = "stock_amount")
+    public double stockAmount;
 
     @Column(name = "price")
     public double price;

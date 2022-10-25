@@ -67,6 +67,13 @@ public class UserResource {
     }
 
     @GET
+    @Path("/{username}")
+    @RolesAllowed("admin")
+    public UserEntity listByUsername(@PathParam("username") String username) {
+        return userEntityDao.findByUsername(username);
+    }
+
+    @GET
     @Path("/quote")
     public FinnhubQuote quote(@Context SecurityContext context, @QueryParam("symbol") String symbol) throws ExecutionException, InterruptedException {
         FinnhubQuote quote = financialResourceClient.quote(symbol).toCompletableFuture().get();

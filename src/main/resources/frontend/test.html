@@ -3,8 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link href="/darkmode.css" rel="stylesheet">
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
+            crossorigin="anonymous"></script>
 </head>
 <body>
-
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand" href="#">Mock Trading</a>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="/home">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="mailto:jordan.dooley@k12.nd.us">Contact Me</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="/admin">Admin</a>
+                </li>
+            </ul>
+        </div>
+        <ul class="navbar-nav mb-2 mb-lg-0">
+            <li>
+                <button class="btn btn-outline-success" type="submit" onclick="logout()">Logout</button>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div class="container flex-box">
+    <h2 class="row">List of all accounts</h2>
+    <div id="buttons row">
+        <button onclick="getUserList()">Refresh</button>
+    </div>
+    <div class="table-responsive row">
+        <table class="table table-striped table-hover caption-top" id="user-list">
+            <caption>Click on users to view stocks and transactions</caption>
+            <thead>
+            <tr>
+                <th scope="col">Username</th>
+                <th scope="col">First Name</th>
+                <th scope="col">Last Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Balance</th>
+                <th scope="col">Role</th>
+            </thead>
+        </table>
+    </div>
+    <h3 class="row" id="username-header">Username</h3>
+    <div class="row">
+        <div class="col">
+            <h4>Stocks</h4>
+            <table class="table table-striped table-hover" id="stock-list">
+                <thead>
+                <tr>
+                    <th scope="col">Symbol</th>
+                    <th scope="col">Quantity</th>
+                </tr>
+                </thead>
+                <tbody id="stock-body"></tbody>
+            </table>
+        </div>
+        <div class="col">
+            <h4>Transactions</h4>
+            <table class="table table-striped table-hover" id="transaction-list">
+                <thead>
+                <tr>
+                    <th scope="col">Symbol</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Timestamp</th>
+                    <th scope="col">Type</th>
+                </tr>
+                </thead>
+                <tbody id="transaction-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
 </body>
+<script>
+    class User {
+
+        constructor(json) {
+            this.username = json.username;
+            this.firstName = json.firstName;
+            this.lastName = json.lastName;
+            this.email = json.email;
+            this.password = json.password;
+            this.cash = json.cash;
+            this.stocks = json.stocks;
+            this.role = json.role;
+            this.transactions = json.transactions;
+        }
+
+        toJsonObject() {
+            return {
+                username: this.username,
+                firstName: this.firstName,
+                lastName: this.lastName,
+                email: this.email,
+                password: this.password,
+                cash: this.cash,
+                stocks: this.stocks,
+                role: this.role,
+                transactions: this.transactions
+            }
+        }
+    }
+
+    function handleRequest(method, url, body, callback) {
+        let xhr = new XMLHttpRequest();
+        xhr.open(method, url);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    callback(xhr.responseText);
+                } else if (xhr.status === 401 || xhr.status === 403) {
+                    window.location.href = "/login";
+                } else {
+                    alert("Error: " + xhr.responseText);
+                }
+            }
+        };
+        xhr.send(body);
+    }
+
+    function showUserData(username) {
+        handleRequest("GET", window.location.origin + "/api/v1/users/" + username, "", function (data) {
+            let user = new User(JSON.parse(data));
+            console.log(data);
+            document.getElementById("username-header").innerText = user.username;
+            let stockBody = document.getElementById("stock-body");
+            let transactionBody = document.getElementById("transaction-body");
+            stockBody.innerHTML = "";
+            transactionBody.innerHTML = "";
+            for (let stock of user.stocks) {
+                stockBody.innerHTML += "<tr><td>" + stock.symbol + "</td><td>" + stock.amount + "</td></tr>";
+            }
+            for (let transaction of user.transactions) {
+                transactionBody.innerHTML += "<tr><td>" + transaction.stockSymbol + "</td><td>" + transaction.stockAmount + "</td><td>" + transaction.price + "</td><td>" + transaction.timestamp + "</td><td>" + transaction.tradeType + "</td></tr>";
+            }
+        });
+    }
+
+    function populateUserList(data) {
+        const userList = document.getElementById("user-list");
+        userList.innerHTML = "";
+        for (let i = 0; i < data.length; i++) {
+            let user = new User(data[i]);
+            userList.innerHTML += "<tr onclick='showUserData(\"" + user.username + "\")'>" +
+                "<td>" + user.username + "</td>" +
+                "<td>" + user.firstName + "</td>" +
+                "<td>" + user.lastName + "</td>" +
+                "<td>" + user.email + "</td>" +
+                "<td>" + user.cash + "</td>" +
+                "<td>" + user.role + "</td>" +
+                "</tr>";
+        }
+    }
+
+    window.onload = getUserList;
+
+    async function getUserList() {
+        handleRequest("GET", window.location.origin + "/api/v1/users/list", "", function (data) {
+            populateUserList(JSON.parse(data));
+        });
+    }
+
+    function logout() {
+        document.cookie = 'quarkus-credential=; Max-Age=0'
+        window.location.href = "/login";
+    }
+</script>
 </html>
