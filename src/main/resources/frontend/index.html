@@ -24,9 +24,12 @@
                     <a class="nav-link active" aria-current="page" href="#">Home</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="/whitelist">Whitelist</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="mailto:jordan.dooley@k12.nd.us">Contact Me</a>
                 </li>
-                <li class="nav-item hiding" id="admin-link">
+                <li class="nav-item d-none" id="admin-link">
                     <a class="nav-link" href="/admin">Admin</a>
                 </li>
             </ul>
@@ -155,7 +158,7 @@
                 } else if (xhr.status === 401 || xhr.status === 403) {
                     window.location.href = "/login";
                 } else {
-                    pushAlert(errorAlert);
+                    pushAlert(detailedError(xhr.responseText));
                 }
             }
         };
@@ -200,6 +203,15 @@
         "        <strong>Transaction Failed!</strong> Transaction failed to be created. Please check your inputs and try again." +
         "    </div>";
 
+    function detailedError(response) {
+        let status = JSON.parse(response).status;
+        let message = JSON.parse(response).detail;
+        return "<div class=\"row alert alert-dismissible alert-danger fade show\" role=\"alert\">\n" +
+            "        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button>\n" +
+            "        <strong>Status "+status+"</strong>" + message +
+            "    </div>";
+    }
+
     function pushAlert(template) {
         const alert = document.createElement('div');
         alert.id = "alert-div";
@@ -235,7 +247,7 @@
         });
     }
 
-    function updateStockDisplay(amount = 0) {
+    function updateStockDisplay(amount = 0, throughInv = false) {
         let symbol = document.getElementById('stock-input').value.toUpperCase();
         let url = window.location.origin + "/api/v1/users/quote?symbol=" + symbol
         if (symbol === '') {
@@ -252,7 +264,7 @@
                 let color = quote.change > 0 ? "limegreen" : "red";
                 document.getElementById('stock-change').style.color = color;
                 document.getElementById('stock-percent-change').style.color = color;
-                document.getElementById(quote.symbol + "-net").textContent = "$" + (quote.cost * amount).toLocaleString('en-US');
+                if (throughInv) document.getElementById(quote.symbol + "-net").textContent = "$" + (quote.cost * amount).toLocaleString('en-US');
             }
         });
     }
@@ -261,6 +273,11 @@
         let url = window.location.origin + '/api/v1/users/me';
         handleRequest('GET', url, null, function (data) {
             let user = new User(JSON.parse(data));
+
+            if (user.role === "admin") {
+                document.getElementById("admin-link").classList.remove("d-none");
+            }
+
             let inventory = user.getStockInventory();
             let table = document.getElementById("stock-table");
             table.innerHTML = "";
@@ -274,7 +291,7 @@
                 table.appendChild(tr);
                 tr.addEventListener('click', function () {
                     document.getElementById('stock-input').value = inventory[i].symbol;
-                    updateStockDisplay(inventory[i].amount);
+                    updateStockDisplay(inventory[i].amount, true);
                 });
                 let net = inventory[i].costPer * inventory[i].amount;
                 if (isNaN(net)) {

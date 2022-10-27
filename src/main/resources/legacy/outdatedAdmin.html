@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Page</title>
+</head>
+<body>
+
+<h2>List of all users</h2>
+<div id="buttons">
+    <button onclick="getUserList()">Refresh</button>
+    <button onclick="logout()">Logout</button>
+</div>
+
+<table id="user-list"></table>
+
+
+
+</body>
+
+<style>
+    th {
+        border: 2px black solid;
+    }
+
+    #hidden {
+        display: none;
+    }
+
+    .transaction-label {
+        color: blue;
+        text-decoration: underline;
+    }
+
+    .transaction-label:hover {
+        cursor: pointer;
+        color: darkblue;
+    }
+
+    .stock-label {
+        color: blue;
+        text-decoration: underline;
+    }
+
+    .stock-label:hover {
+        cursor: pointer;
+        color: darkblue;
+    }
+
+
+    :checked ~ #hidden {
+        display: block;
+    }
+
+    body {
+        background: #dddddd;
+    }
+</style>
+
+<script>
+
+    class User {
+
+        constructor(json) {
+            this.username = json.username;
+            this.firstName = json.firstName;
+            this.lastName = json.lastName;
+            this.email = json.email;
+            this.password = json.password;
+            this.cash = json.cash;
+            this.stocks = json.stocks;
+            this.role = json.role;
+            this.transactions = json.transactions;
+        }
+    }
+
+    function populateUserList(data) {
+        const userList = document.getElementById("user-list");
+        while(userList.firstChild) {
+            userList.removeChild(userList.firstChild);
+        }
+        let columns = ["Username", "First Name", "Last Name", "Email", "Cash", "Stocks", "Role", "Transactions"];
+        userList.appendChild(document.createElement("tr"));
+        for (let c in columns) {
+            let th = document.createElement("th");
+            th.textContent = columns[c];
+            userList.appendChild(th);
+        }
+        for (let i = 0; i < data.length; i++) {
+            let user = new User(data[i]);
+            let tr = document.createElement("tr");
+            let thName = document.createElement("th");
+            thName.textContent = user.username;
+            let thFirst = document.createElement("th");
+            thFirst.textContent = user.firstName;
+            let thLast = document.createElement("th");
+            thLast.textContent = user.lastName;
+            let thEmail = document.createElement("th");
+            thEmail.textContent = user.email;
+            let thCash = document.createElement("th");
+            thCash.textContent = user.cash;
+            let thStocks = document.createElement("th");
+            let thRole = document.createElement("th");
+            thRole.textContent = user.role;
+            let thTransactions = document.createElement("th");
+
+            // stocks here:
+            let stockInput = document.createElement("input");
+            stockInput.type ="checkbox";
+            stockInput.id = "stock-input-" + user.username;
+            stockInput.style.display = "none";
+            let stockLabel = document.createElement("label");
+            stockLabel.classList.add("stock-label");
+            stockLabel.htmlFor = "stock-input-" + user.username;
+            stockLabel.textContent = "Show/Hide";
+            let stockDiv = document.createElement("div");
+            stockDiv.id = "hidden";
+            let stockTable = document.createElement("table");
+            let stockColumns = ["Symbol", "Quantity"];
+            let stockTr = document.createElement("tr");
+            for (let c in stockColumns) {
+                let th = document.createElement("th");
+                th.textContent = stockColumns[c];
+                stockTr.appendChild(th);
+            }
+            stockTable.appendChild(stockTr);
+            for (let s in user.stocks) {
+                let stock = user.stocks[s];
+                let tr = document.createElement("tr");
+                let thSymbol = document.createElement("th");
+                thSymbol.textContent = stock.symbol;
+                let thQuantity = document.createElement("th");
+                thQuantity.textContent = stock.amount;
+                tr.appendChild(thSymbol);
+                tr.appendChild(thQuantity);
+                stockTable.appendChild(tr);
+            }
+            stockDiv.appendChild(stockTable);
+            thStocks.append(stockInput, stockLabel, stockDiv);
+
+            // transactions here:
+            let input = document.createElement("input");
+            input.type = "checkbox";
+            input.id = "transactions-" + user.username;
+            input.style.display = "none";
+            let label = document.createElement("label");
+            label.classList.add("transaction-label");
+            label.htmlFor = "transactions-" + user.username;
+            label.textContent = "Show/Hide";
+            let div = document.createElement("div");
+            div.id = "hidden";
+            let table = document.createElement("table");
+            let tr1 = document.createElement("tr");
+            let th2 = document.createElement("th");
+            th2.textContent = "Stock";
+            let th3 = document.createElement("th");
+            th3.textContent = "Quantity";
+            let th4 = document.createElement("th");
+            th4.textContent = "Price";
+            let th5 = document.createElement("th");
+            th5.textContent = "Date";
+            let th6 = document.createElement("th");
+            th6.textContent = "Type";
+            tr1.append(th2, th3, th4, th5, th6);
+            table.appendChild(tr1);
+            div.appendChild(table);
+            for (let j = 0; j < user.transactions.length; j++) {
+                let transaction = user.transactions[j];
+                let tr1 = document.createElement("tr");
+                let th1 = document.createElement("th");
+                th1.textContent = transaction.id;
+                let th2 = document.createElement("th");
+                th2.textContent = transaction.stock.symbol;
+                let th3 = document.createElement("th");
+                th3.textContent = transaction.stock.amount;
+                let th4 = document.createElement("th");
+                th4.textContent = transaction.price;
+                let th5 = document.createElement("th");
+                th5.textContent = transaction.timestamp;
+                let th6 = document.createElement("th");
+                th6.textContent = transaction.tradeType;
+                tr1.append(th2, th3, th4, th5, th6);
+                table.appendChild(tr1);
+            }
+            div.appendChild(table);
+
+
+            thTransactions.append(input, label, div);
+            tr.append(thName, thFirst, thLast, thEmail, thCash, thStocks, thRole, thTransactions);
+            userList.appendChild(tr);
+        }
+    }
+
+    window.onload = getUserList;
+
+    async function getUserList() {
+        let Http = new XMLHttpRequest();
+        let url = window.location.origin + "/api/v1/users/list";
+        Http.open("GET", url);
+        Http.send();
+
+        Http.onreadystatechange = (e) => {
+            console.log(Http.status);
+            if (Http.status === 200) {
+                console.log(Http.responseText);
+                populateUserList(JSON.parse(Http.responseText));
+            }
+        }
+    }
+
+    function logout() {
+        document.cookie = 'quarkus-credential=; Max-Age=0'
+        window.location.href = "/login";
+    }
+
+</script>
+</html>
