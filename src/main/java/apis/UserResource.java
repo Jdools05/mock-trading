@@ -55,7 +55,6 @@ public class UserResource {
     @GET
     @Path("/list")
     @RolesAllowed("admin")
-    @Produces(MediaType.APPLICATION_JSON)
     @Transactional
     public List<UserEntity> listAll(@Context SecurityContext context) {
         return userEntityDao.listAll();
@@ -95,7 +94,6 @@ public class UserResource {
 
     @POST
     @Path("/create")
-    @Produces(MediaType.APPLICATION_JSON)
     @Transactional
     @PermitAll
     public UserEntity createUser(@NotNull @QueryParam("username") String username, @NotNull @QueryParam("firstName") String firstName, @NotNull @QueryParam("lastName") String lastName, @NotNull @QueryParam("password") String password, @NotNull @QueryParam("email") String email) {
@@ -121,14 +119,6 @@ public class UserResource {
     }
 
     @GET
-    @Path("/apikey")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Transactional
-    public String apikey(@Context SecurityContext context) {
-        return ConfigProvider.getConfig().getValue("ApiKeys.finnhubApiKey", String.class);
-    }
-
-    @GET
     @Path("email-available")
     @PermitAll
     @Transactional
@@ -138,7 +128,6 @@ public class UserResource {
 
     @PUT
     @Path("/transaction")
-    @Produces(MediaType.APPLICATION_JSON)
     @Transactional
     public UserEntity appendTransaction(@Context SecurityContext securityContext, @NotNull @QueryParam("symbol") String symbol, @NotNull @QueryParam("amount") double amount, @NotNull @QueryParam("pricePu") double price, @NotNull @QueryParam("tradeType") TradeType tradeType) {
         if (price <= 0) {
