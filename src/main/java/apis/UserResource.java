@@ -6,7 +6,7 @@ import com.tietoevry.quarkus.resteasy.problem.HttpProblem;
 import database.daos.StockEntityDao;
 import database.daos.TransactionHistoryDao;
 import database.daos.UserEntityDao;
-import database.daos.WhitelistStockDao;
+import database.daos.WhitelistStockEntityDao;
 import database.entities.StockEntity;
 import database.entities.TransactionHistoryEntity;
 import database.entities.UserEntity;
@@ -18,7 +18,6 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.*;
@@ -50,23 +49,17 @@ public class UserResource {
     StockEntityDao stockEntityDao;
 
     @Inject
-    WhitelistStockDao whitelistStockDao;
+    WhitelistStockEntityDao whitelistStockEntityDao;
 
     @GET
     @Path("/list")
     @RolesAllowed("admin")
-<<<<<<< Updated upstream
-=======
-    @Produces(MediaType.APPLICATION_JSON)
->>>>>>> Stashed changes
-    @Transactional
     public List<UserEntity> listAll(@Context SecurityContext context) {
         return userEntityDao.listAll();
     }
 
     @GET
     @Path("/me")
-    @Transactional
     public UserEntity listByUsername(@Context SecurityContext context) {
         return userEntityDao.findByUsername(context.getUserPrincipal().getName());
     }
@@ -74,14 +67,12 @@ public class UserResource {
     @GET
     @Path("/{username}")
     @RolesAllowed("admin")
-    @Transactional
     public UserEntity listByUsername(@PathParam("username") String username) {
         return userEntityDao.findByUsername(username);
     }
 
     @GET
     @Path("/quote")
-    @Transactional
     public FinnhubQuote quote(@Context SecurityContext context, @QueryParam("symbol") String symbol) throws ExecutionException, InterruptedException {
         FinnhubQuote quote = financialResourceClient.quote(symbol).toCompletableFuture().get();
         quote.symbol = symbol;
@@ -91,7 +82,6 @@ public class UserResource {
     @GET
     @Path("/username-available")
     @PermitAll
-    @Transactional
     public boolean isUsernameAvailable(@Context SecurityContext context, @QueryParam("username") String username) {
         return userEntityDao.findByUsername(username) == null;
     }
@@ -123,20 +113,8 @@ public class UserResource {
     }
 
     @GET
-<<<<<<< Updated upstream
-=======
-    @Path("/apikey")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Transactional
-    public String apikey(@Context SecurityContext context) {
-        return ConfigProvider.getConfig().getValue("ApiKeys.finnhubApiKey", String.class);
-    }
-
-    @GET
->>>>>>> Stashed changes
     @Path("email-available")
     @PermitAll
-    @Transactional
     public boolean isEmailAvailable(@Context SecurityContext context, @QueryParam("email") String email) {
         return userEntityDao.findByEmail(email) == null;
     }
@@ -153,7 +131,7 @@ public class UserResource {
                     .withInstance(URI.create("/api/v1/users/transaction"))
                     .build();
         }
-        if (!whitelistStockDao.isWhitelisted(symbol)) {
+        if (!whitelistStockEntityDao.isWhitelisted(symbol)) {
             throw HttpProblem.builder()
                     .withStatus(Response.Status.fromStatusCode(422))
                     .withTitle("Invalid Symbol")

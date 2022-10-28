@@ -48,22 +48,18 @@ public class UserEntityDao {
         return userEntity;
     }
 
-    @Transactional
     public List<UserEntity> listAll() {
         return UserEntity.listAll();
     }
 
-    @Transactional
     public UserEntity get(int id) {
         return UserEntity.findById(id);
     }
 
-    @Transactional
     public UserEntity findByUsername(String username) {
         return UserEntity.find("username", username).firstResult();
     }
 
-    @Transactional
     public UserEntity findByEmail(String email) {
         return UserEntity.find("email", email).firstResult();
     }

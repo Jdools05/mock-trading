@@ -7,7 +7,7 @@ import javax.transaction.Transactional;
 import java.util.Locale;
 
 @ApplicationScoped
-public class WhitelistStockDao {
+public class WhitelistStockEntityDao {
 
         public boolean isWhitelisted(String symbol) {
             return WhitelistStockEntity.find("symbol", symbol.toUpperCase(Locale.ROOT)).firstResult() != null;
