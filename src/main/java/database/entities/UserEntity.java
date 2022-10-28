@@ -38,7 +38,7 @@ public class UserEntity extends PanacheEntity {
     public double cash;
 
     @Column(name = "stocks")
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     public List<StockEntity> stocks;
 
     @Column(name = "transaction_history")

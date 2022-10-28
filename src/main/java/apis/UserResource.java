@@ -55,6 +55,10 @@ public class UserResource {
     @GET
     @Path("/list")
     @RolesAllowed("admin")
+<<<<<<< Updated upstream
+=======
+    @Produces(MediaType.APPLICATION_JSON)
+>>>>>>> Stashed changes
     @Transactional
     public List<UserEntity> listAll(@Context SecurityContext context) {
         return userEntityDao.listAll();
@@ -119,6 +123,17 @@ public class UserResource {
     }
 
     @GET
+<<<<<<< Updated upstream
+=======
+    @Path("/apikey")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Transactional
+    public String apikey(@Context SecurityContext context) {
+        return ConfigProvider.getConfig().getValue("ApiKeys.finnhubApiKey", String.class);
+    }
+
+    @GET
+>>>>>>> Stashed changes
     @Path("email-available")
     @PermitAll
     @Transactional
