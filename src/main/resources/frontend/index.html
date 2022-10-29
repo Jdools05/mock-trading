@@ -146,6 +146,12 @@
         getUserStockInventory();
         pushAlert(infoAlert)
     };
+    
+    const moneyFormatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        maximumFractionDigits: 2
+    });
 
     function handleRequest(method, url, body, callback) {
         let xhr = new XMLHttpRequest();
@@ -236,7 +242,7 @@
         handleRequest('GET', urlquote, null, function (data) {
             let quote = JSON.parse(data);
             let price = quote.cost;
-            if (!confirm('Are you sure you want to ' + type + ' ' + quantity + ' shares of ' + symbol + ' for $' + price + ' per share?')) {
+            if (!confirm('Are you sure you want to ' + type + ' ' + quantity + ' shares of ' + symbol + ' for ' + moneyFormatter.format(price) + ' per share?')) {
                 return;
             }
             let url = window.location.origin + '/api/v1/users/transaction?symbol=' + symbol + '&amount=' + quantity + '&pricePu=' + price + '&tradeType=' + type;
@@ -258,13 +264,13 @@
             let quote = JSON.parse(data);
             if (quote.cost != null) {
                 let tr = document.createElement('tr');
-                tr.innerHTML = "<td>" + quote.symbol + "</td><td>" + "$" + quote.cost.toLocaleString('en-US') + "</td><td id='stock-change'>" + "$" + quote.change.toLocaleString('en-US') + "</td><td id='stock-percent-change'>" + quote.percentChange.toString() + "%</td><td>" + "$" + quote.high.toLocaleString('en-US') + "</td><td>" + "$" + quote.low.toLocaleString('en-US') + "</td><td>" + "$" + quote.dayOpen.toLocaleString('en-US') + "</td><td>" + "$" + quote.previousClose.toLocaleString('en-US') + "</td>";
+                tr.innerHTML = "<td>" + quote.symbol + "</td><td>" + moneyFormatter.format(quote.cost) + "</td><td id='stock-change'>" + moneyFormatter.format(quote.change) + "</td><td id='stock-percent-change'>" + quote.percentChange.toString() + "%</td><td>" + moneyFormatter.format(quote.high) + "</td><td>" + moneyFormatter.format(quote.low) + "</td><td>" + moneyFormatter.format(quote.dayOpen) + "</td><td>" + moneyFormatter.format(quote.previousClose) + "</td>";
                 document.getElementById("stock-lookup").innerHTML = "";
                 document.getElementById("stock-lookup").appendChild(tr);
                 let color = quote.change > 0 ? "limegreen" : "red";
                 document.getElementById('stock-change').style.color = color;
                 document.getElementById('stock-percent-change').style.color = color;
-                if (throughInv) document.getElementById(quote.symbol + "-net").textContent = "$" + (quote.cost * amount).toLocaleString('en-US');
+                if (throughInv) document.getElementById(quote.symbol + "-net").textContent = moneyFormatter.format(quote.cost * amount);
             }
         });
     }
@@ -284,10 +290,10 @@
             let name = document.getElementById("user-username");
             name.textContent = user.firstName
             let cash = document.getElementById("user-balance");
-            cash.textContent = "$" + user.cash.toLocaleString('en-US');
+            cash.textContent = moneyFormatter.format(user.cash);
             for (let i = 0; i < inventory.length; i++) {
                 let tr = document.createElement('tr');
-                tr.innerHTML = "<td>" + inventory[i].symbol + "</td><td>" + inventory[i].amount + "</td><td id='" + inventory[i].symbol + "-net'>" + "$" + (inventory[i].costPer * inventory[i].amount).toLocaleString('en-US') + "</td>";
+                tr.innerHTML = "<td>" + inventory[i].symbol + "</td><td>" + inventory[i].amount + "</td><td id='" + inventory[i].symbol + "-net'>" + (inventory[i].costPer * inventory[i].amount).toLocaleString('en-US') + "</td>";
                 table.appendChild(tr);
                 tr.addEventListener('click', function () {
                     document.getElementById('stock-input').value = inventory[i].symbol;
@@ -297,7 +303,7 @@
                 if (isNaN(net)) {
                     net = 0;
                 }
-                document.getElementById(inventory[i].symbol + '-net').textContent = "$" + net.toLocaleString('en-US');
+                document.getElementById(inventory[i].symbol + '-net').textContent = moneyFormatter.format(net);
             }
         });
 

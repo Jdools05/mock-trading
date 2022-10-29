@@ -89,6 +89,13 @@
 </div>
 </body>
 <script>
+
+    const moneyFormatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2
+    });
+
     class User {
 
         constructor(json) {
@@ -145,11 +152,21 @@
             let transactionBody = document.getElementById("transaction-body");
             stockBody.innerHTML = "";
             transactionBody.innerHTML = "";
-            for (let stock of user.stocks) {
-                stockBody.innerHTML += "<tr><td>" + stock.symbol + "</td><td>" + stock.amount + "</td></tr>";
+            // if user has stocks, add them to the table else add a row saying they have no stocks
+            if (user.stocks.length > 0) {
+                for (let stock of user.stocks) {
+                    stockBody.innerHTML += "<tr><td>" + stock.symbol + "</td><td>" + stock.amount + "</td></tr>";
+                }
+            } else {
+                stockBody.innerHTML += "<tr><td colspan='2'>No stocks</td></tr>";
             }
-            for (let transaction of user.transactions) {
-                transactionBody.innerHTML += "<tr><td>" + transaction.stockSymbol + "</td><td>" + transaction.stockAmount + "</td><td>" + transaction.price + "</td><td>" + transaction.timestamp + "</td><td>" + transaction.tradeType + "</td></tr>";
+            // same for transactions
+            if (user.transactions.length > 0) {
+                for (let transaction of user.transactions) {
+                    transactionBody.innerHTML += "<tr><td>" + transaction.stockSymbol + "</td><td>" + transaction.stockAmount + "</td><td>" + moneyFormatter.format(transaction.price) + "</td><td>" + transaction.timestamp + "</td><td>" + transaction.tradeType + "</td></tr>";
+                }
+            } else {
+                transactionBody.innerHTML += "<tr><td colspan='5'>No transactions</td></tr>";
             }
         });
     }
@@ -164,7 +181,7 @@
                 "<td>" + user.firstName + "</td>" +
                 "<td>" + user.lastName + "</td>" +
                 "<td>" + user.email + "</td>" +
-                "<td>" + user.cash + "</td>" +
+                "<td>" + moneyFormatter.format(user.cash) + "</td>" +
                 "<td>" + user.role + "</td>" +
                 "</tr>";
         }
