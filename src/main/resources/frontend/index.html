@@ -74,6 +74,7 @@
                     </table>
                 </div>
             </div>
+            <button class="btn btn-info mb-2" onclick="copyTableEntryToClipboard()">Copy entry for stock charting</button>
         </div>
         <div class="col">
             <div class="col text-center card border-info">
@@ -146,7 +147,7 @@
         getUserStockInventory();
         pushAlert(infoAlert)
     };
-    
+
     const moneyFormatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
@@ -204,6 +205,11 @@
         "        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button>\n" +
         "        <strong>Transaction Created!</strong> Transaction has been created and stored in the database." +
         "    </div>";
+    const copySuccessAlert = "<div class='row alert alert-dismissible alert-success fade show' role='alert'>\n" +
+        "        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>\n" +
+        "        <strong>Table Entry Copied!</strong> The table entry has been copied to your clipboard." +
+        "    </div>";
+
     const errorAlert = "<div class=\"row alert alert-dismissible alert-danger fade show\" role=\"alert\">\n" +
         "        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button>\n" +
         "        <strong>Transaction Failed!</strong> Transaction failed to be created. Please check your inputs and try again." +
@@ -214,7 +220,7 @@
         let message = JSON.parse(response).detail;
         return "<div class=\"row alert alert-dismissible alert-danger fade show\" role=\"alert\">\n" +
             "        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button>\n" +
-            "        <strong>Status "+status+"</strong>" + message +
+            "        <strong>Status " + status + "</strong>" + message +
             "    </div>";
     }
 
@@ -307,6 +313,41 @@
             }
         });
 
+    }
+
+    function copyTableEntryToClipboard() {
+        let symbol = document.getElementById('stock-input').value.toUpperCase();
+        let url = window.location.origin + "/api/v1/users/quote?symbol=" + symbol
+        if (symbol === '') {
+            alert('Please enter a symbol');
+            return;
+        }
+        handleRequest('GET', url, null, function (data) {
+            let quote = JSON.parse(data);
+            if (quote.cost != null) {
+                handleRequest('GET', window.location.origin + "/api/v1/users/me", null, function (userData) {
+                    let user = new User(JSON.parse(userData));
+                    let inventory = user.getStockInventory();
+                    let amount = 0;
+                    for (let i = 0; i < inventory.length; i++) {
+                        if (inventory[i].symbol === symbol) {
+                            amount = inventory[i].amount;
+                            break;
+                        }
+                    }
+                    let net = quote.cost * amount;
+                    if (isNaN(net)) {
+                        net = 0;
+                    }
+                    let date = new Date();
+                    let dateString = date.getMonth() + 1 + "/" + date.getDate() + "/" + date.getFullYear();
+                    // format string as date, price, amount, gross, net
+                    let clipboardString = dateString + "\n\n" + moneyFormatter.format(quote.cost) + "\n\n" + amount + "\n\n" + moneyFormatter.format(quote.cost * amount) + "\n\nChange me";
+                    navigator.clipboard.writeText(clipboardString);
+                    pushAlert(copySuccessAlert);
+                });
+            }
+        });
     }
 </script>
 </body>
