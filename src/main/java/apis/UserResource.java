@@ -72,14 +72,6 @@ public class UserResource {
     }
 
     @GET
-    @Path("/quote")
-    public FinnhubQuote quote(@Context SecurityContext context, @QueryParam("symbol") String symbol) throws ExecutionException, InterruptedException {
-        FinnhubQuote quote = financialResourceClient.quote(symbol).toCompletableFuture().get();
-        quote.symbol = symbol;
-        return quote;
-    }
-
-    @GET
     @Path("/username-available")
     @PermitAll
     public boolean isUsernameAvailable(@Context SecurityContext context, @QueryParam("username") String username) {
@@ -119,72 +111,5 @@ public class UserResource {
         return userEntityDao.findByEmail(email) == null;
     }
 
-    @PUT
-    @Path("/transaction")
-    @Transactional
-    public UserEntity appendTransaction(@Context SecurityContext securityContext, @NotNull @QueryParam("symbol") String symbol, @NotNull @QueryParam("amount") double amount, @NotNull @QueryParam("pricePu") double price, @NotNull @QueryParam("tradeType") TradeType tradeType) {
-        if (price <= 0) {
-            throw HttpProblem.builder()
-                    .withStatus(Response.Status.fromStatusCode(422))
-                    .withTitle("Invalid Price")
-                    .withDetail("The price per unit must be greater than 0.")
-                    .withInstance(URI.create("/api/v1/users/transaction"))
-                    .build();
-        }
-        if (!whitelistStockEntityDao.isWhitelisted(symbol)) {
-            throw HttpProblem.builder()
-                    .withStatus(Response.Status.fromStatusCode(422))
-                    .withTitle("Invalid Symbol")
-                    .withDetail("The symbol " + symbol + " is not whitelisted.")
-                    .withInstance(URI.create("/api/v1/users/transaction"))
-                    .build();
-        }
-        if (amount <= 0) {
-            throw HttpProblem.builder()
-                    .withStatus(Response.Status.fromStatusCode(422))
-                    .withTitle("Invalid Amount")
-                    .withDetail("The amount must be greater than 0.")
-                    .withInstance(URI.create("/api/v1/users/transaction"))
-                    .build();
-        }
-        StockEntity stockEntity = stockEntityDao.create(symbol, amount);
-        stockEntity.persist();
-        UserEntity userEntity = userEntityDao.findByUsername(securityContext.getUserPrincipal().getName());
-        List<StockEntity> userInv = userEntity.stocks;
-        StockEntity requestedStock = userInv.stream().filter((s -> Objects.equals(s.symbol, symbol))).findFirst().orElse(null);
-        if (tradeType == TradeType.BUY) {
-            if (userEntity.cash < amount * price) {
-                throw HttpProblem.builder()
-                        .withStatus(Response.Status.fromStatusCode(422))
-                        .withTitle("Insufficient Funds")
-                        .withDetail("You do not have enough cash to complete this transaction.")
-                        .withInstance(URI.create("/api/v1/users/transaction"))
-                        .build();
-            }
-            if (requestedStock == null) {
-                userInv.add(stockEntity);
-                requestedStock = stockEntity;
-            } else {
-                requestedStock.amount += amount;
-            }
-            userEntity.cash -= amount * price;
-        } else if (tradeType == TradeType.SELL) {
-            if (requestedStock == null || requestedStock.amount < amount) {
-                throw HttpProblem.builder()
-                        .withStatus(Response.Status.fromStatusCode(422))
-                        .withTitle("Insufficient Stock")
-                        .withDetail("You do not have enough stock to complete this transaction.")
-                        .withInstance(URI.create("/api/v1/users/transaction"))
-                        .build();
-            }
-            requestedStock.amount -= amount;
-            if (requestedStock.amount == 0) {
-                userEntity.stocks.remove(requestedStock);
-            }
-            userEntity.cash += amount * price;
-        }
-        TransactionHistoryEntity transactionEntity = transactionHistoryDao.create(stockEntity, price, tradeType);
-        userEntity = userEntityDao.appendTransaction(userEntity, transactionEntity);
-        return userEntity;
-    }
+
 }

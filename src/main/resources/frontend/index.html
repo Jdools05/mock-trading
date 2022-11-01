@@ -99,13 +99,13 @@
                             <tbody id="stock-lookup">
                             <tr>
                                 <td>Example</td>
-                                <td>$100</td>
-                                <td>$10</td>
+                                <td>$100.00</td>
+                                <td>$10.00</td>
                                 <td>10%</td>
-                                <td>$110</td>
-                                <td>$90</td>
-                                <td>$105</td>
-                                <td>$90</td>
+                                <td>$110.00</td>
+                                <td>$90.00</td>
+                                <td>$105.00</td>
+                                <td>$90.00</td>
                         </table>
                     </div>
                     <div class="d-flex">
@@ -244,15 +244,15 @@
             return;
         }
 
-        let urlquote = window.location.origin + "/api/v1/users/quote?symbol=" + symbol;
+        let urlquote = window.location.origin + "/api/v1/stocks/quote?symbol=" + symbol;
         handleRequest('GET', urlquote, null, function (data) {
             let quote = JSON.parse(data);
             let price = quote.cost;
             if (!confirm('Are you sure you want to ' + type + ' ' + quantity + ' shares of ' + symbol + ' for ' + moneyFormatter.format(price) + ' per share?')) {
                 return;
             }
-            let url = window.location.origin + '/api/v1/users/transaction?symbol=' + symbol + '&amount=' + quantity + '&pricePu=' + price + '&tradeType=' + type;
-            handleRequest('PUT', url, null, function (data) {
+            let url = window.location.origin + '/api/v1/stocks/transaction?symbol=' + symbol + '&amount=' + quantity + '&pricePu=' + price + '&tradeType=' + type;
+            handleRequest('POST', url, null, function (data) {
                 pushAlert(successAlert);
                 getUserStockInventory();
             });
@@ -261,7 +261,7 @@
 
     function updateStockDisplay(amount = 0, throughInv = false) {
         let symbol = document.getElementById('stock-input').value.toUpperCase();
-        let url = window.location.origin + "/api/v1/users/quote?symbol=" + symbol
+        let url = window.location.origin + "/api/v1/stocks/quote?symbol=" + symbol
         if (symbol === '') {
             alert('Please enter a symbol');
             return;
@@ -317,7 +317,7 @@
 
     function copyTableEntryToClipboard() {
         let symbol = document.getElementById('stock-input').value.toUpperCase();
-        let url = window.location.origin + "/api/v1/users/quote?symbol=" + symbol
+        let url = window.location.origin + "/api/v1/stocks/quote?symbol=" + symbol
         if (symbol === '') {
             alert('Please enter a symbol');
             return;

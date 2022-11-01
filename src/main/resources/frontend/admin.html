@@ -149,7 +149,6 @@
     function showUserData(username) {
         handleRequest("GET", window.location.origin + "/api/v1/users/" + username, "", function (data) {
             let user = new User(JSON.parse(data));
-            console.log(data);
             document.getElementById("username-header").innerText = user.username;
             let stockBody = document.getElementById("stock-body");
             let transactionBody = document.getElementById("transaction-body");
