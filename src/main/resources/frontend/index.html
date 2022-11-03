@@ -45,7 +45,7 @@
 </nav>
 <div class="container text-container">
     <div class="row justify-content-between">
-        <div class="col-8 col-md-6 col-lg-4 text-center card border-success">
+        <div class="col-10 col-md-7 col-lg-5 text-center card border-success">
             <div class="card-header">
                 <h4>Stock Inventory</h4>
             </div>
@@ -56,7 +56,8 @@
                         <tr>
                             <th scope="col">Stock</th>
                             <th scope="col">Amount</th>
-                            <th scope="col">Net Value</th>
+                            <th scope="col">Current Value</th>
+                            <th scope="col">Net Gain/Loss</th>
                         </tr>
                         </thead>
                         <tbody id="stock-table">
@@ -64,17 +65,20 @@
                             <td>Example 1</td>
                             <td>10</td>
                             <td>$100</td>
+                            <td>-$40</td>
                         </tr>
                         <tr>
                             <td>Example 2</td>
                             <td>20</td>
                             <td>$200</td>
+                            <td>-$80</td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-            <button class="btn btn-info mb-2" onclick="copyTableEntryToClipboard()">Copy entry for stock charting</button>
+            <button class="btn btn-info mb-2" onclick="copyTableEntryToClipboard()">Copy entry for stock charting
+            </button>
         </div>
         <div class="col">
             <div class="col text-center card border-info">
@@ -259,7 +263,7 @@
         });
     }
 
-    function updateStockDisplay(amount = 0, throughInv = false) {
+    function updateStockDisplay(amount = 0, throughInv = false, net = 0) {
         let symbol = document.getElementById('stock-input').value.toUpperCase();
         let url = window.location.origin + "/api/v1/stocks/quote?symbol=" + symbol
         if (symbol === '') {
@@ -276,7 +280,11 @@
                 let color = quote.change > 0 ? "limegreen" : "red";
                 document.getElementById('stock-change').style.color = color;
                 document.getElementById('stock-percent-change').style.color = color;
-                if (throughInv) document.getElementById(quote.symbol + "-net").textContent = moneyFormatter.format(quote.cost * amount);
+                if (throughInv) document.getElementById(quote.symbol + "-current").textContent = moneyFormatter.format(quote.cost * amount);
+                if (throughInv) {
+                    document.getElementById(quote.symbol + "-net").textContent = moneyFormatter.format(net + (quote.cost * amount));
+                    document.getElementById(quote.symbol + "-net").style.color = net + (quote.cost * amount) > 0 ? "limegreen" : "red";
+                }
             }
         });
     }
@@ -299,17 +307,27 @@
             cash.textContent = moneyFormatter.format(user.cash);
             for (let i = 0; i < inventory.length; i++) {
                 let tr = document.createElement('tr');
-                tr.innerHTML = "<td>" + inventory[i].symbol + "</td><td>" + inventory[i].amount + "</td><td id='" + inventory[i].symbol + "-net'>" + (inventory[i].costPer * inventory[i].amount).toLocaleString('en-US') + "</td>";
+                tr.innerHTML = "<td>" + inventory[i].symbol + "</td><td>" + inventory[i].amount + "</td><td id='" + inventory[i].symbol + "-current'>" + (inventory[i].costPer * inventory[i].amount).toLocaleString('en-US') + "</td><td id='" + inventory[i].symbol + "-net'>$0.00</td>";
                 table.appendChild(tr);
                 tr.addEventListener('click', function () {
                     document.getElementById('stock-input').value = inventory[i].symbol;
-                    updateStockDisplay(inventory[i].amount, true);
+                    // sum up the transaction history to find net gain/loss
+                    let transactions = user.transactions;
+                    let net = 0;
+                    for (let j = 0; j < transactions.length; j++) {
+                        if (transactions[j].stockSymbol === inventory[i].symbol) {
+                            net += transactions[j].stockAmount * transactions[j].price * (transactions[j].tradeType === "BUY" ? -1 : 1);
+                        }
+                    }
+                    // pass it into the update display function
+                    updateStockDisplay(inventory[i].amount, true, net);
+
                 });
-                let net = inventory[i].costPer * inventory[i].amount;
-                if (isNaN(net)) {
-                    net = 0;
+                let gross = inventory[i].costPer * inventory[i].amount;
+                if (isNaN(gross)) {
+                    gross = 0;
                 }
-                document.getElementById(inventory[i].symbol + '-net').textContent = moneyFormatter.format(net);
+                document.getElementById(inventory[i].symbol + '-current').textContent = moneyFormatter.format(gross);
             }
         });
 
@@ -335,14 +353,15 @@
                             break;
                         }
                     }
-                    let net = quote.cost * amount;
-                    if (isNaN(net)) {
-                        net = 0;
+                    let gross = quote.cost * amount;
+                    if (isNaN(gross)) {
+                        gross = 0;
                     }
                     let date = new Date();
                     let dateString = date.getMonth() + 1 + "/" + date.getDate() + "/" + date.getFullYear();
+                    let net = document.getElementById(symbol + "-net").textContent;
                     // format string as date, price, amount, gross, net
-                    let clipboardString = dateString + "\n\n" + moneyFormatter.format(quote.cost) + "\n\n" + amount + "\n\n" + moneyFormatter.format(quote.cost * amount) + "\n\nChange me";
+                    let clipboardString = dateString + "\n\n" + moneyFormatter.format(quote.cost) + "\n\n" + amount + "\n\n" + moneyFormatter.format(gross) + "\n\n" + net;
                     navigator.clipboard.writeText(clipboardString);
                     pushAlert(copySuccessAlert);
                 });
