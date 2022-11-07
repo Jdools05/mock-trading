@@ -41,11 +41,6 @@ public class StaticContent {
         StaticHandler.create(FileSystemAccess.RELATIVE, "META-INF/bootstrap.min.css").handle(rc);
     }
 
-    @Route(path = "/error", methods = Route.HttpMethod.GET)
-    void errorContent(RoutingContext rc) {
-        StaticHandler.create(FileSystemAccess.RELATIVE, "frontend/error.html").handle(rc);
-    }
-
     @Route(path = "/register", methods = Route.HttpMethod.GET)
     void registerContent(RoutingContext rc) {
         StaticHandler.create(FileSystemAccess.RELATIVE, "frontend/register.html").handle(rc);
