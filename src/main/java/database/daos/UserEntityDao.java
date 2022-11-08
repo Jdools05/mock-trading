@@ -3,6 +3,7 @@ package database.daos;
 import database.entities.TransactionHistoryEntity;
 import database.entities.UserEntity;
 import io.quarkus.elytron.security.common.BcryptUtil;
+import io.quarkus.security.User;
 import org.eclipse.microprofile.config.ConfigProvider;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -62,5 +63,14 @@ public class UserEntityDao {
 
     public UserEntity findByEmail(String email) {
         return UserEntity.find("email", email).firstResult();
+    }
+
+    public UserEntity update(UserEntity userEntity) {
+        userEntity.persist();
+        return userEntity;
+    }
+
+    public void delete(UserEntity user) {
+        user.delete();
     }
 }
