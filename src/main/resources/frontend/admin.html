@@ -95,6 +95,59 @@
             </div>
         </div>
     </div>
+    <div class="card border-danger p-2" id="user-edit-container" style="display: none;">
+        <h4>Change User Info</h4>
+        <div class="row">
+            <div class="col">
+                <label>
+                    Set Cash Balance:
+                    <input type="number" placeholder="$50,000"></input>
+                </label>
+                <button class="btn-danger" onclick="console.log('Hello')">Update</button>
+            </div>
+        </div>
+        <div class="row py-2">
+            <div class="col">
+                <label>
+                    Promote to Admin:
+                    <button class="btn-danger" onclick="console.log('Hello')">Promote</button>
+                </label>
+            </div>
+        </div>
+        <div class="row py-2">
+            <div class="col-auto">
+                <label>
+                    Clear Stocks:
+                    <button class="btn-danger" onclick="console.log('Hello')">Clear</button>
+                </label>
+            </div>
+            <div class="col">
+                <label>
+                    Clear Transactions:
+                    <button class="btn-danger" onclick="console.log('Hello')">Clear</button>
+                </label>
+            </div>
+        </div>
+        <div class="row py-2">
+            <div class="col">
+                <label>
+                    Delete User:
+                    <button class="btn-danger" onclick="console.log('Hello')">Delete</button>
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="card border-danger p-2 my-2">
+        <h4>Danger Zone</h4>
+        <div class="row">
+            <div class="col-auto">
+                <label>
+                    Clear all users:
+                    <button class="btn-danger" onclick="console.log('Hello')">Clear</button>
+                </label>
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 <script>
@@ -158,6 +211,12 @@
             document.getElementById("username-header").innerText = user.username;
             let stockBody = document.getElementById("stock-body");
             let transactionBody = document.getElementById("transaction-body");
+            let userEditContainer = document.getElementById("user-edit-container");
+            if (user.role === "admin") {
+                userEditContainer.style.display = "none";
+            } else {
+                userEditContainer.style.display = "block";
+            }
             stockBody.innerHTML = "";
             transactionBody.innerHTML = "";
             // if user has stocks, add them to the table else add a row saying they have no stocks
