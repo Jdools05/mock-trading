@@ -49,6 +49,11 @@ public class UserEntityDao {
         return userEntity;
     }
 
+    @Transactional
+    public void deleteAllUsers() {
+        UserEntity.delete("role", "user");
+    }
+
     public List<UserEntity> listAll() {
         return UserEntity.listAll();
     }

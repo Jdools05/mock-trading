@@ -59,10 +59,10 @@ public class UserResource {
     }
 
     @PUT
-    @Path("/update")
+    @Path("/update/{username}")
     @Transactional
     @RolesAllowed("admin")
-    public Response update(@Context SecurityContext context, @QueryParam("username") @NotNull String username, @QueryParam("cash") @NotNull double cash, @NotNull @QueryParam("role") String role, @NotNull @QueryParam("clear-stocks") boolean clearStocks, @NotNull @QueryParam("clear-transactions") boolean clearTransactions) {
+    public Response update(@Context SecurityContext context, @PathParam("username") String username, @NotNull UserEntity userEntity) {
         UserEntity user = userEntityDao.findByUsername(username);
         if (user == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -70,28 +70,18 @@ public class UserResource {
         if (user.role.equals("admin")) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
-        if (cash < 0) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        } else if (cash > 0) {
-            user.cash = cash;
-        }
-        if (role.equals("admin") || role.equals("user")) {
-            user.role = role;
-        }
-        if (clearStocks) {
-            user.stocks.clear();
-        }
-        if (clearTransactions) {
-            user.transactions.clear();
-        }
+        user.cash = userEntity.cash;
+        user.role = userEntity.role;
+        user.transactions = userEntity.transactions;
+        user.stocks = userEntity.stocks;
         return Response.ok(userEntityDao.update(user)).build();
     }
 
     @DELETE
-    @Path("/delete")
+    @Path("/{username}")
     @Transactional
     @RolesAllowed("admin")
-    public Response delete(@Context SecurityContext context, @QueryParam("username") @NotNull String username) {
+    public Response delete(@Context SecurityContext context, @PathParam("username") String username) {
         UserEntity user = userEntityDao.findByUsername(username);
         if (user == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -100,6 +90,15 @@ public class UserResource {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
         userEntityDao.delete(user);
+        return Response.ok().build();
+    }
+
+    @DELETE
+    @Path("/delete-all")
+    @Transactional
+    @RolesAllowed("admin")
+    public Response deleteAll(@Context SecurityContext context) {
+        userEntityDao.deleteAllUsers();
         return Response.ok().build();
     }
 

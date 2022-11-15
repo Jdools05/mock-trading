@@ -101,16 +101,16 @@
             <div class="col">
                 <label>
                     Set Cash Balance:
-                    <input type="number" placeholder="$50,000"></input>
+                    <input type="number" placeholder="$50,000" id="cash-input"></input>
                 </label>
-                <button class="btn-danger" onclick="console.log('Hello')">Update</button>
+                <button class="btn-danger" onclick="if (selectedUser == null) {alert('No user selected!')} else updateUser(parseFloat(document.getElementById('cash-input').value), 'user', false, false)">Update</button>
             </div>
         </div>
         <div class="row py-2">
             <div class="col">
                 <label>
                     Promote to Admin:
-                    <button class="btn-danger" onclick="console.log('Hello')">Promote</button>
+                    <button class="btn-danger" onclick="if (selectedUser == null) {alert('No user selected!')} else updateUser(selectedUser.cash, 'admin', false, false)">Promote</button>
                 </label>
             </div>
         </div>
@@ -118,13 +118,13 @@
             <div class="col-auto">
                 <label>
                     Clear Stocks:
-                    <button class="btn-danger" onclick="console.log('Hello')">Clear</button>
+                    <button class="btn-danger" onclick="if (selectedUser == null) {alert('No user selected!')} else updateUser(selectedUser.cash, 'user', true, false)">Clear</button>
                 </label>
             </div>
             <div class="col">
                 <label>
                     Clear Transactions:
-                    <button class="btn-danger" onclick="console.log('Hello')">Clear</button>
+                    <button class="btn-danger" onclick="if (selectedUser == null) {alert('No user selected!')} else updateUser(selectedUser.cash, 'user', false, true)">Clear</button>
                 </label>
             </div>
         </div>
@@ -132,7 +132,7 @@
             <div class="col">
                 <label>
                     Delete User:
-                    <button class="btn-danger" onclick="console.log('Hello')">Delete</button>
+                    <button class="btn-danger" onclick="if (selectedUser == null) {alert('No user selected!')} else deleteUser();">Delete</button>
                 </label>
             </div>
         </div>
@@ -142,8 +142,8 @@
         <div class="row">
             <div class="col-auto">
                 <label>
-                    Clear all users:
-                    <button class="btn-danger" onclick="console.log('Hello')">Clear</button>
+                    Delete all users:
+                    <button class="btn-danger" onclick="deleteAllUsers()">Delete</button>
                 </label>
             </div>
         </div>
@@ -157,6 +157,8 @@
         currency: 'USD',
         minimumFractionDigits: 2
     });
+
+    let selectedUser = null;
 
     class User {
 
@@ -187,6 +189,38 @@
         }
     }
 
+    function deleteUser() {
+        if (selectedUser == null) {
+            alert('No user selected!');
+            return;
+        }
+        if (confirm('Are you sure you want to delete ' + selectedUser.username + '?')) {
+            handleRequest('DELETE', window.location.origin + '/api/v1/users/' + selectedUser.username, null, (date) => {
+                getUserList();
+                alert('User deleted!');
+                revertUserEdit();
+            });
+        }
+    }
+
+    function deleteAllUsers() {
+        if (confirm('Are you sure you want to delete all users?')) {
+            handleRequest('DELETE', window.location.origin + '/api/v1/users/delete-all', null, (date) => {
+                getUserList();
+                alert('All users deleted!');
+                revertUserEdit();
+            });
+        }
+    }
+
+    function revertUserEdit() {
+        selectedUser = null;
+        document.getElementById('user-edit-container').style.display = 'none';
+        document.getElementById('username-header').innerText = 'Username';
+        document.getElementById('stock-body').innerHTML = '';
+        document.getElementById('transaction-body').innerHTML = '';
+    }
+
     function handleRequest(method, url, body, callback) {
         let xhr = new XMLHttpRequest();
         xhr.open(method, url);
@@ -208,6 +242,7 @@
     function showUserData(username) {
         handleRequest("GET", window.location.origin + "/api/v1/users/" + username, "", function (data) {
             let user = new User(JSON.parse(data));
+            selectedUser = user;
             document.getElementById("username-header").innerText = user.username;
             let stockBody = document.getElementById("stock-body");
             let transactionBody = document.getElementById("transaction-body");
@@ -252,6 +287,29 @@
                 "<td>" + user.role + "</td>" +
                 "</tr>";
         }
+    }
+
+    function updateUser(cash, role, clearStocks, clearTransactions, username = selectedUser.username) {
+        if (username === null) {
+            alert("No user selected");
+            return;
+        }
+        handleRequest("GET", window.location.origin + "/api/v1/users/" + username, "", function (data) {
+            let user = new User(JSON.parse(data));
+            user.cash = cash;
+            user.role = role;
+            if (clearStocks) {
+                user.stocks = [];
+            }
+            if (clearTransactions) {
+                user.transactions = [];
+            }
+            handleRequest("PUT", window.location.origin + "/api/v1/users/update/" + username, JSON.stringify(user.toJsonObject()), function (data) {
+                alert("User updated");
+                showUserData(username);
+                getUserList();
+            });
+        });
     }
 
     window.onload = getUserList;
