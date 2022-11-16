@@ -167,26 +167,12 @@
             this.firstName = json.firstName;
             this.lastName = json.lastName;
             this.email = json.email;
-            this.password = json.password;
             this.cash = json.cash;
             this.stocks = json.stocks;
             this.role = json.role;
             this.transactions = json.transactions;
         }
 
-        toJsonObject() {
-            return {
-                username: this.username,
-                firstName: this.firstName,
-                lastName: this.lastName,
-                email: this.email,
-                password: this.password,
-                cash: this.cash,
-                stocks: this.stocks,
-                role: this.role,
-                transactions: this.transactions
-            }
-        }
     }
 
     function deleteUser() {
@@ -304,7 +290,7 @@
             if (clearTransactions) {
                 user.transactions = [];
             }
-            handleRequest("PUT", window.location.origin + "/api/v1/users/update/" + username, JSON.stringify(user.toJsonObject()), function (data) {
+            handleRequest("PUT", window.location.origin + "/api/v1/users/update/" + username, JSON.stringify(user), function (data) {
                 alert("User updated");
                 showUserData(username);
                 getUserList();

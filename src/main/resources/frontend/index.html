@@ -191,15 +191,10 @@
             this.firstName = json.firstName;
             this.lastName = json.lastName;
             this.email = json.email;
-            this.password = json.password;
             this.cash = json.cash;
             this.role = json.role;
             this.transactions = json.transactions;
             this.stockInventory = json.stocks;
-        }
-
-        getStockInventory() {
-            return this.stockInventory;
         }
     }
 
@@ -353,7 +348,7 @@
             if (quote.cost != null) {
                 handleRequest('GET', window.location.origin + "/api/v1/users/me", null, function (userData) {
                     let user = new User(JSON.parse(userData));
-                    let inventory = user.getStockInventory();
+                    let inventory = user.stockInventory;
                     let amount = 0;
                     for (let i = 0; i < inventory.length; i++) {
                         if (inventory[i].symbol === symbol) {
