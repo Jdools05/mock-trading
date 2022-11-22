@@ -301,7 +301,7 @@
                 document.getElementById("admin-link").classList.remove("d-none");
             }
 
-            let inventory = user.getStockInventory();
+            let inventory = user.stockInventory;
             let table = document.getElementById("stock-table");
             table.innerHTML = "";
             let name = document.getElementById("user-username");
