@@ -41,6 +41,12 @@ public class StaticContent {
         StaticHandler.create(FileSystemAccess.RELATIVE, "META-INF/bootstrap.min.css").handle(rc);
     }
 
+    @PermitAll
+    @Route(path = "/favicon.ico", methods = Route.HttpMethod.GET)
+    void faviconContent(RoutingContext rc) {
+        StaticHandler.create(FileSystemAccess.RELATIVE, "META-INF/favicon.ico").handle(rc);
+    }
+
     @Route(path = "/register", methods = Route.HttpMethod.GET)
     void registerContent(RoutingContext rc) {
         StaticHandler.create(FileSystemAccess.RELATIVE, "frontend/register.html").handle(rc);

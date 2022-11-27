@@ -129,4 +129,5 @@ public class StockResource {
         userEntity = userEntityDao.appendTransaction(userEntity, transactionEntity);
         return userEntity;
     }
+
 }

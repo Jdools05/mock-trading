@@ -40,6 +40,35 @@
         </ul>
     </div>
 </nav>
+<div class="container">
+    <div class="row justify-content-center my-3">
+        <div class="col-lg-8 col-md-10 col-12 card border-success">
+            <div class="card-header">
+                <h3>Whitelist Stock Request</h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="stock-symbol" class="form-label">Stock Symbol</label>
+                    <input type="text" class="form-control" id="stock-symbol">
+                </div>
+                <div class="mb-3">
+                    <label for="stock-name" class="form-label">Stock Name</label>
+                    <input type="text" class="form-control" id="stock-name">
+                </div>
+                <div class="mb-3">
+                    <label for="stock-exchange" class="form-label">Exchange</label>
+                    <input type="text" class="form-control" id="stock-exchange">
+                </div>
+            </div>
+            <div class="card-footer">
+                <button type="submit" class="btn btn-success" onclick="submitRequest()">Submit</button>
+            </div>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div id="alert-container" class="col-lg-8 col-md-10 col-12"></div>
+    </div>
+</div>
 </body>
 <script>
     class User {
@@ -54,6 +83,22 @@
             this.transactions = json.transactions;
             this.stockInventory = json.stocks;
         }
+    }
+
+    const successAlert = (message) => {
+        return `<div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <h3 class="alert-heading">Success!</h3>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+    }
+
+    const errorAlert = (message) => {
+        return `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <h3 class="alert-heading">Error!</h3>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
     }
 
     function logout() {
@@ -72,11 +117,37 @@
                 } else if (xhr.status === 401 || xhr.status === 403) {
                     window.location.href = "/login";
                 } else {
-                    pushAlert(errorAlert);
+                    pushAlert(errorAlert(xhr.responseText));
                 }
             }
         };
         xhr.send(body);
+    }
+
+    function submitRequest() {
+        let stockSymbol = document.getElementById("stock-symbol").value;
+        let stockName = document.getElementById("stock-name").value;
+        let stockExchange = document.getElementById("stock-exchange").value;
+        let request = {
+            "stockSymbol": stockSymbol,
+            "stockName": stockName,
+            "stockExchange": stockExchange
+        };
+        handleRequest("POST", "api/v1/whitelist/request", JSON.stringify(request), function (response) {
+            document.getElementById("stock-symbol").value = "";
+            document.getElementById("stock-name").value = "";
+            document.getElementById("stock-exchange").value = "";
+
+            pushAlert(successAlert("Request submitted successfully!"));
+        });
+    }
+
+    function pushAlert(alert) {
+        let alertContainer = document.getElementById("alert-container");
+        alertContainer.innerHTML = alert;
+        setTimeout(function () {
+            alertContainer.innerHTML = "";
+        }, 10000);
     }
 </script>
 </html>
