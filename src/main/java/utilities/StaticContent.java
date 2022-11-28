@@ -23,6 +23,11 @@ public class StaticContent {
         StaticHandler.create(FileSystemAccess.RELATIVE, "frontend/login.html").handle(rc);
     }
 
+    @Route(path = "/whitelist", methods = Route.HttpMethod.GET)
+    void whitelistContent(RoutingContext rc) {
+        StaticHandler.create(FileSystemAccess.RELATIVE, "frontend/whitelist.html").handle(rc);
+    }
+
     @RolesAllowed("admin")
     @Route(path = "/admin", methods = Route.HttpMethod.GET)
     void adminContent(RoutingContext rc) {
