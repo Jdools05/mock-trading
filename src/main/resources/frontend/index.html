@@ -78,8 +78,8 @@
                     </table>
                 </div>
             </div>
-            <button class="btn btn-info mb-2" onclick="copyTableEntryToClipboard()">Copy entry for stock charting
-            </button>
+<!--            <button class="btn btn-info mb-2" onclick="copyTableEntryToClipboard()">Copy entry for stock charting-->
+<!--            </button>-->
         </div>
         <div class="col p-0">
             <div class="container">
@@ -206,7 +206,7 @@
 
     const infoAlert = "<div class=\"row alert alert-dismissible alert-info fade show\" role=\"alert\">\n" +
         "        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button>\n" +
-        "        <strong>New Feature!</strong> You can click on the stocks in your inventory! This will automatically look up the current stock price and calculate value of your current holdings!" +
+        "        <strong>Welcome!</strong> This is the main page to manage your stocks and create transactions!" +
         "    </div>";
 
     const successAlert = "<div class=\"row alert alert-dismissible alert-success fade show\" role=\"alert\">\n" +
@@ -362,10 +362,10 @@
                         gross = 0;
                     }
                     let date = new Date();
-                    let dateString = date.getMonth() + 1 + "/" + date.getDate() + "/" + date.getFullYear();
+                    let dateString = date.getMonth() + 1 + "-" + date.getDate() + "-" + date.getFullYear();
                     let net = document.getElementById(symbol + "-net").textContent;
                     // format string as date, price, amount, gross, net
-                    let clipboardString = dateString + "\n\n" + moneyFormatter.format(quote.cost) + "\n\n" + amount + "\n\n" + moneyFormatter.format(gross) + "\n\n" + net;
+                    let clipboardString = "\n" + dateString + " \n\n" + moneyFormatter.format(quote.cost) + " \n\n" + amount + " \n\n" + moneyFormatter.format(gross) + " \n\n" + net + " \n\n";
                     navigator.clipboard.writeText(clipboardString);
                     pushAlert(copySuccessAlert);
                 });
