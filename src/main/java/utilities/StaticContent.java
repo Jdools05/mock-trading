@@ -29,11 +29,11 @@ public class StaticContent {
         StaticHandler.create(FileSystemAccess.RELATIVE, "frontend/admin.html").handle(rc);
     }
 
-    @PermitAll
-    @Route(path = "/test", methods = Route.HttpMethod.GET)
-    void testContent(RoutingContext rc) {
-        StaticHandler.create(FileSystemAccess.RELATIVE, "frontend/test.html").handle(rc);
-    }
+//    @PermitAll
+//    @Route(path = "/test", methods = Route.HttpMethod.GET)
+//    void testContent(RoutingContext rc) {
+//        StaticHandler.create(FileSystemAccess.RELATIVE, "frontend/test.html").handle(rc);
+//    }
 
     @PermitAll
     @Route(path = "/darkmode.css", methods = Route.HttpMethod.GET)
