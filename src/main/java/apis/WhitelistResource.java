@@ -3,6 +3,7 @@ package apis;
 import database.daos.StockRequestDao;
 import database.daos.WhitelistStockEntityDao;
 import database.entities.StockRequestEntity;
+import database.entities.WhitelistStockEntity;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
@@ -38,6 +39,12 @@ public class WhitelistResource {
     public Response request(@QueryParam("symbol") String symbol, @QueryParam("name") String name, @QueryParam("exchange") String exchange) {
         stockRequestDao.addStockRequest(symbol, name, exchange);
         return Response.created(URI.create("/api/v1/whitelist/request")).build();
+    }
+
+    @GET
+    @RolesAllowed({"user", "admin"})
+    public List<WhitelistStockEntity> getWhitelist() {
+        return whitelistStockEntityDao.getAll();
     }
 
     @GET

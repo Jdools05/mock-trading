@@ -4,6 +4,7 @@ import database.entities.WhitelistStockEntity;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Locale;
 
 @ApplicationScoped
@@ -19,5 +20,9 @@ public class WhitelistStockEntityDao {
             entity.symbol = symbol.toUpperCase(Locale.ROOT);
             entity.persist();
             return entity;
+        }
+
+        public List<WhitelistStockEntity> getAll() {
+            return WhitelistStockEntity.listAll();
         }
 }
