@@ -50,6 +50,13 @@ public class UserEntityDao {
     }
 
     @Transactional
+    public UserEntity updatePassword(long id, String password) {
+        UserEntity user = UserEntity.findById(id);
+        user.password = BcryptUtil.bcryptHash(password);
+        return user;
+    }
+
+    @Transactional
     public void deleteAllUsers() {
         UserEntity.delete("role", "user");
     }
