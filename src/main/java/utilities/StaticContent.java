@@ -34,6 +34,18 @@ public class StaticContent {
         StaticHandler.create(FileSystemAccess.RELATIVE, "frontend/admin.html").handle(rc);
     }
 
+    @PermitAll
+    @Route(path = "/reset-password", methods = Route.HttpMethod.GET)
+    void resetPasswordContent(RoutingContext rc) {
+        StaticHandler.create(FileSystemAccess.RELATIVE, "frontend/reset-password.html").handle(rc);
+    }
+
+    @PermitAll
+    @Route(path = "/request-password-reset", methods = Route.HttpMethod.GET)
+    void requestPasswordResetContent(RoutingContext rc) {
+        StaticHandler.create(FileSystemAccess.RELATIVE, "frontend/request-password-reset.html").handle(rc);
+    }
+
 //    @PermitAll
 //    @Route(path = "/test", methods = Route.HttpMethod.GET)
 //    void testContent(RoutingContext rc) {

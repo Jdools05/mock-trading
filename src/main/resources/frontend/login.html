@@ -14,6 +14,7 @@
         <h3>Mock Trading Login</h3>
     <form action="j_security_check" method="post" class="card col-lg-4 col-md-4 col-sm-8 col-10">
         <h4 class="card-header d-none text-danger" id="incorrect-label">Incorrect Username or Password!</h4>
+        <h4 class="card-header d-none text-success" id="password-reset-label">Password Reset!</h4>
         <!-- Email input -->
         <div class="form-outline mb-4 mt-2">
             <input type="text" id="j_username" name="j_username" class="form-control" required/>
@@ -33,6 +34,8 @@
         <div class="text-center">
             <p>Not a member? <a href="/register">Register</a></p>
         </div>
+        <div class="text-center">
+            <p>Forgot password? <a href="/request-password-reset">Reset</a></p>
     </form>
 </div>
 </body>
@@ -41,6 +44,8 @@
         for (let param of new URLSearchParams(window.location.search)) {
             if (param[0] === "error") {
                 document.getElementById("incorrect-label").classList.remove("d-none");
+            } else if (param[0] === "reset") {
+                document.getElementById("password-reset-label").classList.remove("d-none");
             }
         }
     }
