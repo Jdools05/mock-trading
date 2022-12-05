@@ -4,7 +4,6 @@ import clients.authorizations.FinnhubAuthorizationFactory;
 import clients.models.finnhub.FinnhubQuote;
 import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
-import org.jboss.logging.annotations.BaseUrl;
 
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
@@ -23,4 +22,5 @@ public interface FinancialResourceClient {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     CompletionStage<FinnhubQuote> quote(@QueryParam("symbol") String symbol);
+
 }

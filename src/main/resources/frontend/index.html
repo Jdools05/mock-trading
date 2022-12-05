@@ -9,6 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
             crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
 </head>
 <body>
@@ -78,8 +79,8 @@
                     </table>
                 </div>
             </div>
-<!--            <button class="btn btn-info mb-2" onclick="copyTableEntryToClipboard()">Copy entry for stock charting-->
-<!--            </button>-->
+            <!--            <button class="btn btn-info mb-2" onclick="copyTableEntryToClipboard()">Copy entry for stock charting-->
+            <!--            </button>-->
         </div>
         <div class="col p-0">
             <div class="container">
@@ -154,11 +155,39 @@
             </div>
         </div>
     </div>
+    <div id="alert-container"></div>
+    <div class="row justify-content-center my-2">
+        <div class="card border-dark col-12" style="min-height: 600px;" id="stock-candle-container">
+            <div class="card-body">
+                <div class="tradingview-widget-container" style="height: 100%;">
+                    <div id="tradingview_c1b01" style="height: 100%;"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+                    <script type="text/javascript">
+                        new TradingView.widget(
+                            {
+                                "autosize": true,
+                                "symbol": "NASDAQ:AAPL",
+                                "interval": "D",
+                                "timezone": "Etc/UTC",
+                                "theme": "dark",
+                                "style": "1",
+                                "locale": "en",
+                                "toolbar_bg": "#f1f3f6",
+                                "enable_publishing": false,
+                                "allow_symbol_change": true,
+                                "container_id": "tradingview_c1b01"
+                            }
+                        );
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <script>
     window.onload = function () {
         getUserStockInventory();
-        pushAlert(infoAlert)
+        pushAlert(infoAlert);
     };
 
     const moneyFormatter = new Intl.NumberFormat('en-US', {
@@ -206,7 +235,8 @@
 
     const infoAlert = "<div class=\"row alert alert-dismissible alert-info fade show\" role=\"alert\">\n" +
         "        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button>\n" +
-        "        <strong>Welcome!</strong> This is the main page to manage your stocks and create transactions!" +
+        "        <strong>Welcome!</strong> This is the main page to manage your stocks and create transactions!\n" +
+        "        Note that the financial data between the stock lookup and the candlestick chart may be different due to discrepancies in the time of recording." +
         "    </div>";
 
     const successAlert = "<div class=\"row alert alert-dismissible alert-success fade show\" role=\"alert\">\n" +
@@ -240,7 +270,7 @@
         if (document.getElementById("alert-div") != null) {
             document.getElementById("alert-div").remove();
         }
-        document.querySelector('.text-container').appendChild(alert);
+        document.getElementById("alert-container").appendChild(alert);
     }
 
     function createTransaction() {
