@@ -17,7 +17,7 @@
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <a class="navbar-brand" href="#">Mock Trading</a>
+        <a class="navbar-brand" href="/home">Mock Trading</a>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
@@ -51,7 +51,6 @@
             <caption class="text-success">Click on users to view stocks and transactions</caption>
             <thead>
             <tr>
-                <th scope="col">Username</th>
                 <th scope="col">First Name</th>
                 <th scope="col">Last Name</th>
                 <th scope="col">Email</th>
@@ -62,7 +61,7 @@
             </tbody>
         </table>
     </div>
-    <h3 class="row" id="username-header">Username</h3>
+    <h3 class="row" id="email-header">Email</h3>
     <div class="row">
         <div class="col">
             <h4>Stocks</h4>
@@ -164,7 +163,6 @@
     class User {
 
         constructor(json) {
-            this.username = json.username;
             this.firstName = json.firstName;
             this.lastName = json.lastName;
             this.email = json.email;
@@ -181,8 +179,8 @@
             alert('No user selected!');
             return;
         }
-        if (confirm('Are you sure you want to delete ' + selectedUser.username + '?')) {
-            handleRequest('DELETE', window.location.origin + '/api/v1/users/' + selectedUser.username, null, (date) => {
+        if (confirm('Are you sure you want to delete ' + selectedUser.email + '?')) {
+            handleRequest('DELETE', window.location.origin + '/api/v1/users/' + selectedUser.email, null, (date) => {
                 getUserList();
                 alert('User deleted!');
                 revertUserEdit();
@@ -203,7 +201,7 @@
     function revertUserEdit() {
         selectedUser = null;
         document.getElementById('user-edit-container').style.display = 'none';
-        document.getElementById('username-header').innerText = 'Username';
+        document.getElementById('email-header').innerText = 'Email';
         document.getElementById('stock-body').innerHTML = '';
         document.getElementById('transaction-body').innerHTML = '';
     }
@@ -226,11 +224,11 @@
         xhr.send(body);
     }
 
-    function showUserData(username) {
-        handleRequest("GET", window.location.origin + "/api/v1/users/" + username, "", function (data) {
+    function showUserData(email) {
+        handleRequest("GET", window.location.origin + "/api/v1/users/" + email, "", function (data) {
             let user = new User(JSON.parse(data));
             selectedUser = user;
-            document.getElementById("username-header").innerText = user.username;
+            document.getElementById("email-header").innerText = user.email;
             let stockBody = document.getElementById("stock-body");
             let transactionBody = document.getElementById("transaction-body");
             let userEditContainer = document.getElementById("user-edit-container");
@@ -265,8 +263,7 @@
         userList.innerHTML = "";
         for (let i = 0; i < data.length; i++) {
             let user = new User(data[i]);
-            userList.innerHTML += "<tr onclick='showUserData(\"" + user.username + "\")'>" +
-                "<td>" + user.username + "</td>" +
+            userList.innerHTML += "<tr onclick='showUserData(\"" + user.email + "\")'>" +
                 "<td>" + user.firstName + "</td>" +
                 "<td>" + user.lastName + "</td>" +
                 "<td>" + user.email + "</td>" +
@@ -276,12 +273,12 @@
         }
     }
 
-    function updateUser(cash, role, clearStocks, clearTransactions, username = selectedUser.username) {
-        if (username === null) {
+    function updateUser(cash, role, clearStocks, clearTransactions, email = selectedUser.email) {
+        if (email === null) {
             alert("No user selected");
             return;
         }
-        handleRequest("GET", window.location.origin + "/api/v1/users/" + username, "", function (data) {
+        handleRequest("GET", window.location.origin + "/api/v1/users/" + email, "", function (data) {
             let user = new User(JSON.parse(data));
             user.cash = cash;
             user.role = role;
@@ -291,9 +288,9 @@
             if (clearTransactions) {
                 user.transactions = [];
             }
-            handleRequest("PUT", window.location.origin + "/api/v1/users/update/" + username, JSON.stringify(user), function (data) {
+            handleRequest("PUT", window.location.origin + "/api/v1/users/update/" + email, JSON.stringify(user), function (data) {
                 alert("User updated");
-                showUserData(username);
+                showUserData(email);
                 getUserList();
             });
         });

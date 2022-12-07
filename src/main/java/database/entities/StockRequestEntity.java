@@ -9,7 +9,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "stock_request_table")
 public class StockRequestEntity extends PanacheEntity {
-    @Column(name = "stock_symbol", nullable = false, unique = true)
+    @Column(name = "stock_symbol", nullable = false)
     public String stockSymbol;
 
     @Column(name = "stock_name", nullable = false)

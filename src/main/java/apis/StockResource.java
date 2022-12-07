@@ -91,7 +91,7 @@ public class StockResource {
         }
         StockEntity stockEntity = stockEntityDao.create(symbol, amount);
         stockEntity.persist();
-        UserEntity userEntity = userEntityDao.findByUsername(securityContext.getUserPrincipal().getName());
+        UserEntity userEntity = userEntityDao.findByEmail(securityContext.getUserPrincipal().getName());
         List<StockEntity> userInv = userEntity.stocks;
         StockEntity requestedStock = userInv.stream().filter((s -> Objects.equals(s.symbol, symbol))).findFirst().orElse(null);
         if (tradeType == TradeType.BUY) {

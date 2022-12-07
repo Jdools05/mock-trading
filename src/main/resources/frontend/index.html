@@ -19,7 +19,7 @@
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <a class="navbar-brand" href="#">Mock Trading</a>
+        <a class="navbar-brand" href="/home">Mock Trading</a>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
@@ -37,7 +37,7 @@
             </ul>
         </div>
         <ul class="navbar-nav mb-2 mb-lg-0">
-            <li class="navbar-brand" id="user-username">NAME</li>
+            <li class="navbar-brand" id="user-name">NAME</li>
             <li class="navbar-brand text-success" id="user-balance">$50,000</li>
             <li>
                 <button class="btn btn-outline-success" type="submit" onclick="logout()">Logout</button>
@@ -217,7 +217,6 @@
     class User {
 
         constructor(json) {
-            this.username = json.username;
             this.firstName = json.firstName;
             this.lastName = json.lastName;
             this.email = json.email;
@@ -335,7 +334,7 @@
             let inventory = user.stockInventory;
             let table = document.getElementById("stock-table");
             table.innerHTML = "";
-            let name = document.getElementById("user-username");
+            let name = document.getElementById("user-name");
             name.textContent = user.firstName
             let cash = document.getElementById("user-balance");
             cash.textContent = moneyFormatter.format(user.cash);

@@ -17,7 +17,6 @@
     <div class="card border-info col-5">
         <div class="card-body">
             <h5 class="card-title">Mock Trading</h5>
-            <p class="card-text">Usernames can only have letters, numbers, a period or underscore, and between 3 and 20 characters.</p>
             <p class="card-text">Passwords must be 4 to 32 characters long and can contain letters, numbers, and these special characters: ! @ # $ % *</p>
         </div>
     </div>
@@ -48,16 +47,6 @@
         </div>
 
         <div class="row my-4">
-            <div class="form-outline col">
-                <input type="text" id="username" name="username" class="form-control" required/>
-                <div class="valid-feedback">
-                    Username available!
-                </div>
-                <div class="invalid-feedback">
-                    Username taken or invalid!
-                </div>
-                <label class="form-label" for="username">Username</label>
-            </div>
             <div class="form-outline col">
                 <input type="text" id="email" name="email" class="form-control" required/>
                 <div class="valid-feedback">
@@ -102,13 +91,10 @@
 </div>
 </body>
 <script>
-
-    let isUsernameValid = false;
     let isEmailValid = false;
 
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
     const passwordRegex = /^\w(\w|[!@#$%*]){4,32}/;
-    const usernameRegex = /^(?=[a-zA-Z0-9._]{3,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/;
 
     function verifyNames() {
         const firstName = document.getElementById("first-name").value;
@@ -140,10 +126,6 @@
             return;
         }
 
-        if (!isUsernameValid) return false;
-
-        console.log("Username valid!");
-
         if (!isEmailValid) return false;
 
         console.log("Email valid!");
@@ -161,10 +143,16 @@
 
         console.log("Passwords match!");
 
+        let firstName = document.getElementById("first-name").value;
+        firstName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
+
+        let lastName = document.getElementById("last-name").value;
+        lastName = lastName.charAt(0).toUpperCase() + lastName.slice(1);
+
         let Http = new XMLHttpRequest();
-        let url = window.location.origin + '/api/v1/users/create?username=' + document.getElementById("username").value
-            + '&firstName=' + document.getElementById("first-name").value + '&lastName='
-            + document.getElementById("last-name").value + '&email='
+        let url = window.location.origin + '/api/v1/users/create?'
+            + '&firstName=' + firstName + '&lastName='
+            + lastName + '&email='
             + encodeURIComponent(document.getElementById("email").value) + '&password='
             + encodeURIComponent(document.getElementById("password").value);
         Http.open("POST", url);
@@ -183,40 +171,7 @@
         return true;
     }
 
-    function getUsernameAvailability() {
-        if (!usernameRegex.test(this.value)) {
-            document.getElementById("username").classList.remove("is-valid");
-            document.getElementById("username").classList.add("is-invalid");
-            isUsernameValid = false;
-            return;
-        }
-        let Http = new XMLHttpRequest();
-        let url = window.location.origin + "/api/v1/users/username-available?username=" + this.value;
-        Http.open("GET", url);
-        Http.send();
-
-        Http.onreadystatechange = (e) => {
-            if (Http.readyState === 4) {
-                if (Http.status === 200) {
-                    if (Http.responseText === "true") {
-                        document.getElementById("username").classList.remove("is-invalid");
-                        document.getElementById("username").classList.add("is-valid");
-                        isUsernameValid = true;
-                    } else {
-                        document.getElementById("username").classList.remove("is-valid");
-                        document.getElementById("username").classList.add("is-invalid");
-                        isUsernameValid = false;
-                    }
-                } else {
-                    console.log("Error: " + Http.responseText);
-                }
-            }
-        }
-    }
-
     document.getElementById("last-name").addEventListener("input", verifyNames);
-
-    document.getElementById("username").addEventListener("input", getUsernameAvailability);
 
     document.getElementById("password").addEventListener("change", function () {
         this.value = this.value.trim();

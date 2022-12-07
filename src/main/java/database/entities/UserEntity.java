@@ -17,14 +17,12 @@ import java.util.List;
 @Entity
 public class UserEntity extends PanacheEntity {
 
-    @Username
-    public String username;
-
     @Password
     @JsonIgnore
     public String password;
 
     @Email
+    @Username
     public String email;
 
     @Roles

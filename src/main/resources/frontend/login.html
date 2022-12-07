@@ -12,13 +12,13 @@
 <body>
 <div class="d-flex justify-content-center row row-cols-1 text-center">
         <h3>Mock Trading Login</h3>
-    <form action="j_security_check" method="post" class="card col-lg-4 col-md-4 col-sm-8 col-10">
-        <h4 class="card-header d-none text-danger" id="incorrect-label">Incorrect Username or Password!</h4>
+    <form action="/j_security_check" method="post" class="card col-lg-4 col-md-4 col-sm-8 col-10">
+        <h4 class="card-header d-none text-danger" id="incorrect-label">Incorrect Email or Password!</h4>
         <h4 class="card-header d-none text-success" id="password-reset-label">Password Reset!</h4>
         <!-- Email input -->
         <div class="form-outline mb-4 mt-2">
             <input type="text" id="j_username" name="j_username" class="form-control" required/>
-            <label class="form-label" for="j_username" >Username</label>
+            <label class="form-label" for="j_username" >Email</label>
         </div>
 
         <!-- Password input -->

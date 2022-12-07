@@ -15,7 +15,7 @@
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <a class="navbar-brand" href="#">Mock Trading</a>
+        <a class="navbar-brand" href="/home">Mock Trading</a>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
@@ -40,7 +40,7 @@
     </div>
 </nav>
 <div class="container">
-    <div class="row justify-content-center my-3">
+    <div class="row justify-content-center mt-2">
         <div class="col-lg-6 col-md-8 col-12 card border-success">
             <div class="card-header">
                 <h3>Whitelist Stock Request</h3>
@@ -78,9 +78,9 @@
         </div>
     </div>
     <div class="row justify-content-center">
-        <div id="alert-container" class="col-lg-8 col-md-10 col-12"></div>
+        <div id="alert-container" class="col-lg-10 col-12"></div>
     </div>
-    <div class="row justify-content-center mb-3" id="whitelist-container">
+    <div class="row justify-content-center mt-2" id="whitelist-container">
         <div class="col-lg-4 col-md-6 col-8 card border-info">
             <div class="card-header">
                 <h3>Whitelist</h3>
@@ -205,6 +205,7 @@
         handleRequest("DELETE", "/api/v1/whitelist/request/" + id, null, function (response) {
             getRequestList();
             successAlert("Request Declined");
+            refreshWhitelist();
         });
     }
 
@@ -212,6 +213,7 @@
         handleRequest("PUT", "/api/v1/whitelist/approve/" + id, null, function (response) {
             getRequestList();
             successAlert("Request Accepted");
+            refreshWhitelist();
         });
     }
 
@@ -239,7 +241,6 @@
     class User {
 
         constructor(json) {
-            this.username = json.username;
             this.firstName = json.firstName;
             this.lastName = json.lastName;
             this.email = json.email;
@@ -251,7 +252,7 @@
     }
 
     const successAlert = (message) => {
-        return `<div class="alert alert-success alert-dismissible fade show" role="alert">
+        return `<div class="alert alert-success alert-dismissible fade show mt-2 mb-0 mx-0" role="alert">
                     <h3 class="alert-heading">Success!</h3>
                     ${message}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -259,7 +260,7 @@
     }
 
     const errorAlert = (message) => {
-        return `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+        return `<div class="alert alert-danger alert-dismissible fade show mt-2 mb-0 mx-0" role="alert">
                     <h3 class="alert-heading">Error!</h3>
                     ${message}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -300,6 +301,7 @@
             document.getElementById("stock-exchange").value = "";
 
             pushAlert(successAlert("Request submitted successfully!"));
+            getRequestList();
         });
     }
 
@@ -307,11 +309,6 @@
         let alertContainer = document.getElementById("alert-container");
         alertContainer.scrollIntoView();
         alertContainer.innerHTML = alert;
-        document.getElementById("whitelist-container").classList.add("my-3");
-        setTimeout(function () {
-            alertContainer.innerHTML = "";
-            document.getElementById("whitelist-container").classList.remove("my-3");
-        }, 10000);
     }
 </script>
 </html>

@@ -14,9 +14,8 @@ import java.util.List;
 public class UserEntityDao {
 
     @Transactional
-    public UserEntity create(String username, String firstName, String lastName, String email, String password, String role, double cash) {
+    public UserEntity create(String firstName, String lastName, String email, String password, String role, double cash) {
         UserEntity entity = new UserEntity();
-        entity.username = username;
         entity.firstName = firstName;
         entity.lastName = lastName;
         entity.email = email;
@@ -29,9 +28,8 @@ public class UserEntityDao {
     }
 
     @Transactional
-    public UserEntity create(String username, String firstName, String lastName, String email, String password) {
+    public UserEntity create(String firstName, String lastName, String email, String password) {
         UserEntity entity = new UserEntity();
-        entity.username = username;
         entity.firstName = firstName;
         entity.lastName = lastName;
         entity.email = email;
@@ -67,10 +65,6 @@ public class UserEntityDao {
 
     public UserEntity get(int id) {
         return UserEntity.findById(id);
-    }
-
-    public UserEntity findByUsername(String username) {
-        return UserEntity.find("username", username).firstResult();
     }
 
     public UserEntity findByEmail(String email) {

@@ -59,11 +59,11 @@ public class UserResource {
     }
 
     @PUT
-    @Path("/update/{username}")
+    @Path("/update/{email}")
     @Transactional
     @RolesAllowed("admin")
-    public Response update(@Context SecurityContext context, @PathParam("username") String username, @NotNull UserEntity userEntity) {
-        UserEntity user = userEntityDao.findByUsername(username);
+    public Response update(@Context SecurityContext context, @PathParam("email") String email, @NotNull UserEntity userEntity) {
+        UserEntity user = userEntityDao.findByEmail(email);
         if (user == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -78,11 +78,11 @@ public class UserResource {
     }
 
     @DELETE
-    @Path("/{username}")
+    @Path("/{email}")
     @Transactional
     @RolesAllowed("admin")
-    public Response delete(@Context SecurityContext context, @PathParam("username") String username) {
-        UserEntity user = userEntityDao.findByUsername(username);
+    public Response delete(@Context SecurityContext context, @PathParam("email") String email) {
+        UserEntity user = userEntityDao.findByEmail(email);
         if (user == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -104,38 +104,23 @@ public class UserResource {
 
     @GET
     @Path("/me")
-    public UserEntity listByUsername(@Context SecurityContext context) {
-        return userEntityDao.findByUsername(context.getUserPrincipal().getName());
+    public UserEntity getActiveUser(@Context SecurityContext context) {
+        return userEntityDao.findByEmail(context.getUserPrincipal().getName());
     }
 
     @GET
-    @Path("/{username}")
+    @Path("/{email}")
     @RolesAllowed("admin")
-    public UserEntity listByUsername(@PathParam("username") String username) {
-        return userEntityDao.findByUsername(username);
-    }
-
-    @GET
-    @Path("/username-available")
-    @PermitAll
-    public boolean isUsernameAvailable(@Context SecurityContext context, @QueryParam("username") String username) {
-        return userEntityDao.findByUsername(username) == null;
+    public UserEntity listByUsername(@PathParam("email") String email) {
+        return userEntityDao.findByEmail(email);
     }
 
     @POST
     @Path("/create")
     @Transactional
     @PermitAll
-    public UserEntity createUser(@NotNull @QueryParam("username") String username, @NotNull @QueryParam("firstName") String firstName, @NotNull @QueryParam("lastName") String lastName, @NotNull @QueryParam("password") String password, @NotNull @QueryParam("email") String email) {
-        System.out.println("Creating user: " + username);
-        if (userEntityDao.findByUsername(username) != null) {
-            throw HttpProblem.builder()
-                    .withStatus(Response.Status.fromStatusCode(422))
-                    .withTitle("User Already Exists")
-                    .withDetail("A user with the username of " + username + " already exists in the system.")
-                    .withInstance(URI.create("/api/v1/users/create"))
-                    .build();
-        }
+    public UserEntity createUser(@NotNull @QueryParam("firstName") String firstName, @NotNull @QueryParam("lastName") String lastName, @NotNull @QueryParam("password") String password, @NotNull @QueryParam("email") String email) {
+        System.out.println("Creating user: " + email);
         if (userEntityDao.findByEmail(email) != null) {
             throw HttpProblem.builder()
                     .withStatus(Response.Status.fromStatusCode(422))
@@ -144,8 +129,7 @@ public class UserResource {
                     .withInstance(URI.create("/api/v1/users/create"))
                     .build();
         }
-        UserEntity entity = userEntityDao.create(username, firstName, lastName, email, password);
-        return entity;
+        return userEntityDao.create(firstName, lastName, email, password);
     }
 
     @GET

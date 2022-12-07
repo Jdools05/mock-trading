@@ -5,11 +5,9 @@ import database.daos.UserEntityDao;
 import database.entities.PasswordResetEntity;
 import database.entities.UserEntity;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
-import org.jboss.logging.annotations.Pos;
 import utilities.EmailHandler;
 
 import javax.annotation.security.PermitAll;
-import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.*;
