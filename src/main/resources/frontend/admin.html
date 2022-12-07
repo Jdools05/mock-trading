@@ -225,6 +225,16 @@
     }
 
     function showUserData(email) {
+        document.getElementById("stock-body").innerHTML = "<tr><td colspan=\"4\" class='align-content-center'>\n" +
+            "                                <div class=\"spinner-border text-warning\" role=\"status\">\n" +
+            "                                    <span class=\"visually-hidden\">Loading...</span>\n" +
+            "                                </div>\n" +
+            "                            </td></tr>";
+        document.getElementById("transaction-body").innerHTML = "<tr><td colspan=\"4\" class='align-content-center'>\n" +
+            "                                <div class=\"spinner-border text-warning\" role=\"status\">\n" +
+            "                                    <span class=\"visually-hidden\">Loading...</span>\n" +
+            "                                </div>\n" +
+            "                            </td></tr>";
         handleRequest("GET", window.location.origin + "/api/v1/users/" + email, "", function (data) {
             let user = new User(JSON.parse(data));
             selectedUser = user;
@@ -299,6 +309,11 @@
     window.onload = getUserList;
 
     async function getUserList() {
+        document.getElementById("user-list-body").innerHTML = "<tr><td colspan=\"4\" class='align-content-center'>\n" +
+            "                                <div class=\"spinner-border text-warning\" role=\"status\">\n" +
+            "                                    <span class=\"visually-hidden\">Loading...</span>\n" +
+            "                                </div>\n" +
+            "                            </td></tr>";
         handleRequest("GET", window.location.origin + "/api/v1/users/list", "", function (data) {
             populateUserList(JSON.parse(data));
         });

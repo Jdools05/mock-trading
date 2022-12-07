@@ -81,7 +81,7 @@
         <div id="alert-container" class="col-lg-10 col-12"></div>
     </div>
     <div class="row justify-content-center mt-2" id="whitelist-container">
-        <div class="col-lg-4 col-md-6 col-8 card border-info">
+        <div class="col-lg-4 col-md-6 col-8 card border-warning">
             <div class="card-header">
                 <h3>Whitelist</h3>
             </div>
@@ -153,6 +153,11 @@
     }
 
     function getRequestList() {
+        document.getElementById("request-table").innerHTML = "<tr><td colspan=\"4\">\n" +
+            "                                <div class=\"spinner-border text-warning\" role=\"status\">\n" +
+            "                                    <span class=\"visually-hidden\">Loading...</span>\n" +
+            "                                </div>\n" +
+            "                            </td></tr>";
         handleRequest("GET", "/api/v1/whitelist/requests", null, function (response) {
             let data = JSON.parse(response);
             let requestTable = document.getElementById("request-table");
@@ -218,6 +223,11 @@
     }
 
     function refreshWhitelist() {
+        document.getElementById("whitelist-table").innerHTML = "<tr><td colspan=\"4\">\n" +
+            "                                <div class=\"spinner-border text-warning\" role=\"status\">\n" +
+            "                                    <span class=\"visually-hidden\">Loading...</span>\n" +
+            "                                </div>\n" +
+            "                            </td></tr>"
         handleRequest("GET", "/api/v1/whitelist", null, function (response) {
             successAlert("Whitelist Refreshed");
             let data = JSON.parse(response);
