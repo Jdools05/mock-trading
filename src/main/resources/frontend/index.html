@@ -29,6 +29,9 @@
                     <a class="nav-link" href="/whitelist">Whitelist</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="/instructions">Instructions</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="mailto:jordan.dooley@k12.nd.us">Contact Me</a>
                 </li>
                 <li class="nav-item d-none" id="admin-link">
@@ -45,7 +48,7 @@
         </ul>
     </div>
 </nav>
-<div class="container text-container">
+<div class="container text-container mt-2">
     <div class="row justify-content-between">
         <div class="col-12 col-xl-5 text-center card border-success">
             <div class="card-header">
@@ -333,6 +336,9 @@
             name.textContent = user.firstName
             let cash = document.getElementById("user-balance");
             cash.textContent = moneyFormatter.format(user.cash);
+            if (inventory.length === 0) {
+                document.getElementById("stock-table").innerHTML = "<tr><td colspan='4'>No stocks owned</td></tr>";
+            }
             for (let i = 0; i < inventory.length; i++) {
                 let tr = document.createElement('tr');
                 tr.innerHTML = "<td>" + inventory[i].symbol + "</td><td>" + inventory[i].amount + "</td><td id='" + inventory[i].symbol + "-current'>" + (inventory[i].costPer * inventory[i].amount).toLocaleString('en-US') + "</td><td id='" + inventory[i].symbol + "-net'>$0.00</td>";

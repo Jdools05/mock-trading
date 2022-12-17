@@ -46,6 +46,14 @@ public class StaticContent {
         StaticHandler.create(FileSystemAccess.RELATIVE, "frontend/request-password-reset.html").handle(rc);
     }
 
+    @RolesAllowed({"user", "admin"})
+    @Route(path = "/instructions", methods = Route.HttpMethod.GET)
+    void instructionsContent(RoutingContext rc) {
+        StaticHandler.create(FileSystemAccess.RELATIVE, "frontend/instructions.html").handle(rc);
+    }
+
+
+
 //    @PermitAll
 //    @Route(path = "/test", methods = Route.HttpMethod.GET)
 //    void testContent(RoutingContext rc) {

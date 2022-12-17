@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Instructions</title>
+    <link href="/darkmode.css" rel="stylesheet">
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
+            crossorigin="anonymous"></script>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand" href="/home">Mock Trading</a>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="/home">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="/whitelist">Whitelist</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/instructions">Instructions</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="mailto:jordan.dooley@k12.nd.us">Contact Me</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin" id="admin-link" style="display: none">Admin</a>
+                </li>
+            </ul>
+        </div>
+        <ul class="navbar-nav mb-2 mb-lg-0">
+            <li>
+                <button class="btn btn-outline-success" type="submit" onclick="logout()">Logout</button>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div class="container text-container">
+    <div class="card border-info mt-2">
+        <div class="card-header">
+            <h3>Instructions</h3>
+        </div>
+        <div class="card-body">
+            <p>Welcome to the Mock Stock Trading program! This program is to help students manage fake stock portfolios.
+                The instructions are broken down into sections based on the page they correspond to.</p>
+        </div>
+    </div>
+    <div class="card border-success mt-2">
+        <div class="card-header">
+            <h3>Home</h3>
+        </div>
+        <div class="card-body">
+            <p>The home page is where most of your stock information will be displayed.</p>
+            <p>Below is an image of the navbar. On the left is the different pages you can visit. On the right is how
+                much cash your account has as well as a logout button. Your cash will update after making
+                transactions.</p>
+            <img src="/images/home-navbar-image.PNG" alt="Home Page" class="img-fluid mb-3">
+            <hr class="mt-4">
+            <p>On the top left of the main page you will see a list of all the stocks you own. By clicking on these
+                stocks will update them to get the current gross price and then calculate the net income / loss of those
+                stocks.</p>
+            <img src="/images/home-stocks-image.PNG" alt="Home Stocks" class="img-fluid mb-3">
+            <hr class="mt-4">
+            <p>On the top right of the home page is the Stock Lookup section. This section will look up the current
+                price of a stock given its symbol. The information of that stock is displayed in the table after
+                "Search" is clicked and a valid stock symbol was typed in the input.</p>
+            <img src="/images/home-stock-lookup-image.PNG" alt="Stock Lookup" class="img-fluid">
+            <img src="/images/home-nvda-stock-lookup-image.PNG" alt="NVDA Stock Lookup" class="img-fluid mb-3">
+            <hr class="mt-4">
+            <p>Under the Stock Lookup section is the Transaction section. This is where you will create your
+                transactions for buying and selling stocks. To create a transaction, you must type a valid stock symbol
+                into the stock lookup input. Then you select "Buy" or "Sell" as well as setting the amount of that stock
+                you want in your transaction. This program will not allow you to buy more stocks than you have the money
+                for, nor will it let you sell more stocks than you have.</p>
+            <img src="/images/home-transaction-buy-image.PNG" alt="Transaction Form" class="img-fluid mb-3">
+            <hr class="mt-4">
+            <p>Under all of the main sections you will see the notification bar. This bar will notify you with
+                information on the latest updates to this program as well as alerting when transactions succeeded or
+                errors were thrown. This notification can be dismissed by clicking the "X" in the top right corner of
+                the box.</p>
+            <img src="/images/home-alert-image.PNG" alt="Alert Bar" class="img-fluid mb-3">
+            <hr class="mt-4">
+            <p>At the bottom of the screen you will find the Stock Candlestick Widget. This widget allows you to view
+                the live market data of virtually any public traded stock. The main features are the stock selection in
+                the top left corner. By clicking on the stock symbol, you can search to display a stock of your
+                choosing. To the left of that is the time range. This is useful for selecting the timespan of each
+                candle. The default is one day per candle, but it can be shortened to one minute per candle. By
+                scrolling or right-clicking on the axis of the graph can change the range of value shown. The horizontal
+                axis is the time of the market and will change based off the time per candle. The vertical axis is the
+                value of the stock. By default, the vertical axis will scale automatically with the price range of the
+                stock. There are many other great features of this chart which are explained <a
+                        href="https://www.tradingview.com">here</a>.</p>
+            <img src="/images/home-candlestick-chart-image.PNG" alt="Candlestick Chart" class="img-fluid">
+        </div>
+    </div>
+    <div class="card border-primary mt-2">
+        <div class="card-header">
+            <h3>Whitelist</h3>
+        </div>
+        <div class="card-body">
+            <p>This page is where you can request stocks to be added to the class whitelist if it is not available.
+                There are already some instructions on the right side explaining the form information. This form is used
+                to submit a stock request to the admins requesting the stock to be added to the class whitelist.</p>
+            <img src="/images/whitelist-form-image.PNG" alt="Whitelist Form" class="img-fluid mb-3">
+            <hr class="mt-4">
+            <p>This list shows all the whitelisted stocks for the class. These stock symbols are open to transactions
+                being placed on them. If you would like a stock to be whitelisted, fill out the form above. Pro-tip: If
+                you want to find if a specific stock is in the list, instead of scrolling forever, use <b>CTRL + F</b>
+                to search for the stock symbol. If a match is not found, request the stock.</p>
+            <img src="/images/whitelist-list-image.PNG" alt="Whitelist List" class="img-fluid">
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    window.onload = checkAdmin;
+
+    function checkAdmin() {
+        handleRequest("GET", "/api/v1/users/me", null, function (response) {
+            let user = new User(JSON.parse(response));
+            if (user.role === "admin") {
+                document.getElementById("admin-link").style.display = "block";
+            }
+        });
+    }
+
+    function handleRequest(method, url, body, callback) {
+        let xhr = new XMLHttpRequest();
+        xhr.open(method, url);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    callback(xhr.responseText);
+                } else if (xhr.status === 401 || xhr.status === 403) {
+                    window.location.href = "/login";
+                } else {
+                    pushAlert(detailedError(xhr.responseText));
+                }
+            }
+        };
+        xhr.send(body);
+    }
+
+    class User {
+
+        constructor(json) {
+            this.firstName = json.firstName;
+            this.lastName = json.lastName;
+            this.email = json.email;
+            this.cash = json.cash;
+            this.role = json.role;
+            this.transactions = json.transactions;
+            this.stockInventory = json.stocks;
+        }
+    }
+
+    function logout() {
+        document.cookie = 'quarkus-credential=; Max-Age=0'
+        window.location.href = "/login";
+    }
+</script>
+</html>
