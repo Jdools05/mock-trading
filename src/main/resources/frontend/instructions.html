@@ -119,10 +119,96 @@
             <img src="/images/whitelist-list-image.PNG" alt="Whitelist List" class="img-fluid">
         </div>
     </div>
+    <div class="card border-warning my-2">
+        <div class="card-header">
+            <h3>Created By: <b id="creator-name">Jordan Dooley</b></h3>
+        </div>
+        <div class="card-body">
+            <p id="random-note" class="minecraft-splash-text"></p>
+            <hr class="mt-4">
+            <p>Thank you for your support and patience. Please report any bugs by emailing me or, if
+                you are really techy, you can file a bug report at: <a
+                        href="https://github.com/Jdools05/mock-trading/issues">Mock Trading Issues</a>. I put a lot of
+                my free time into this project
+                for the benefit of my classmates and all the students in years to come. I hope you enjoy it!
+            </p>
+        </div>
+    </div>
 </div>
 </body>
+<style>
+    #creator-name {
+        color: #ff0000; /* start color */
+        animation: color-animation 10s infinite;
+    }
+
+    @keyframes color-animation {
+        0% {
+            color: #ff0000; /* red */
+        }
+        16.7% {
+            color: #ffff00; /* yellow */
+        }
+        33.3% {
+            color: #00ff00; /* green */
+        }
+        50% {
+            color: #00ffff; /* cyan */
+        }
+        66.7% {
+            color: #0000ff; /* blue */
+        }
+        83.3% {
+            color: #ff00ff; /* magenta */
+        }
+        100% {
+            color: #ff0000; /* red */
+        }
+    }
+
+    .minecraft-splash-text {
+        font-size: 24px;
+        color: gold;
+    }
+
+</style>
 <script>
-    window.onload = checkAdmin;
+    window.onload = function () {
+        checkAdmin();
+        setRandomNote();
+    };
+
+
+    const texts = ["If you don't like the website, feel free to create your own!",
+        "This website was made with love, sweat, and a little bit of HTML.",
+        "\"It felt like I spent a million years programming that website. I swear, I aged more in those few weeks than I have in my entire life. It's like I traveled through a black hole or something. Time and space must have bent around me while I was coding, because it's impossible for me to have spent that long on a single project. I think I even saw a dinosaurs wandering by my window at one point. That's how long it took.\" - Me when asked how long this took.",
+        "Programming this website was like trying to paint the Mona Lisa with a toothbrush - it took forever and was a lot harder than it needed to be.",
+        "I'm not sure if I should be proud or ashamed of the fact that I spent more time on this website than I did on my actual homework.",
+        "99 bugs in the code, 99 bugs in the code. Take one down, patch it around, 127 bugs in the code!",
+        "Java is to JavaScript as ham is to hamster.",
+        "Building this website is like playing with Legos. It's all fun and games until you have to clean up the mess you made.",
+        "If you're reading this, you're probably a nerd. Thank you.",
+        "Wait, this isn't Minecraft!",
+        "If I had a dollar for every error thrown while programming this website, wouldn't have to worry about building this website.",
+        "Code is like humor. When you have to explain it, it's bad.",
+        "When I wrote this code, only God and I understood what I was doing. Now, only God knows.",
+        "Remember kids, its not a bug, its an undocumented feature.",
+        "If you need extra cash for your stocks, you can always sell your soul to the devil. Or you can just sell your soul to me and I'll give you some cash.",
+        "Sometimes, I wonder if I'm a genius or a complete idiot. Then I remember that I'm a programmer, so I'm both.",
+        "There are 10 types of people in the world: those who understand binary, and those who don't.",
+        "The best thing about a boolean is even if you are wrong, you are only off by a bit.",
+        "Without requirements or design, programming is the art of adding bugs to an empty text file.",
+        "Before software can be reusable it first has to be usable.",
+        "The best method for accelerating a computer is the one that boosts it by 9.8 m/s2.",
+        "The secret to school is knowing who knows what you don't.",
+        "Trust me, I'm a professional.",];
+
+
+
+    function setRandomNote() {
+        const paragraph = document.getElementById("random-note");
+        paragraph.textContent = texts[Math.floor(Math.random() * texts.length)];
+    }
 
     function checkAdmin() {
         handleRequest("GET", "/api/v1/users/me", null, function (response) {
