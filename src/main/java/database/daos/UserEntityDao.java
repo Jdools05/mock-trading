@@ -3,6 +3,7 @@ package database.daos;
 import database.entities.TransactionHistoryEntity;
 import database.entities.UserEntity;
 import io.quarkus.elytron.security.common.BcryptUtil;
+import io.quarkus.security.User;
 import org.eclipse.microprofile.config.ConfigProvider;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -13,9 +14,8 @@ import java.util.List;
 public class UserEntityDao {
 
     @Transactional
-    public UserEntity create(String username, String firstName, String lastName, String email, String password, String role, double cash) {
+    public UserEntity create(String firstName, String lastName, String email, String password, String role, double cash) {
         UserEntity entity = new UserEntity();
-        entity.username = username;
         entity.firstName = firstName;
         entity.lastName = lastName;
         entity.email = email;
@@ -28,9 +28,8 @@ public class UserEntityDao {
     }
 
     @Transactional
-    public UserEntity create(String username, String firstName, String lastName, String email, String password) {
+    public UserEntity create(String firstName, String lastName, String email, String password) {
         UserEntity entity = new UserEntity();
-        entity.username = username;
         entity.firstName = firstName;
         entity.lastName = lastName;
         entity.email = email;
@@ -48,6 +47,18 @@ public class UserEntityDao {
         return userEntity;
     }
 
+    @Transactional
+    public UserEntity updatePassword(long id, String password) {
+        UserEntity user = UserEntity.findById(id);
+        user.password = BcryptUtil.bcryptHash(password);
+        return user;
+    }
+
+    @Transactional
+    public void deleteAllUsers() {
+        UserEntity.delete("role", "user");
+    }
+
     public List<UserEntity> listAll() {
         return UserEntity.listAll();
     }
@@ -56,11 +67,16 @@ public class UserEntityDao {
         return UserEntity.findById(id);
     }
 
-    public UserEntity findByUsername(String username) {
-        return UserEntity.find("username", username).firstResult();
-    }
-
     public UserEntity findByEmail(String email) {
         return UserEntity.find("email", email).firstResult();
+    }
+
+    public UserEntity update(UserEntity userEntity) {
+        userEntity.persist();
+        return userEntity;
+    }
+
+    public void delete(UserEntity user) {
+        user.delete();
     }
 }

@@ -26,7 +26,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 @Tag(name = "User Resource", description = "Endpoints for user data")
 @Path("/api/v1/users")
@@ -55,47 +54,73 @@ public class UserResource {
     @GET
     @Path("/list")
     @RolesAllowed("admin")
-    @Produces(MediaType.APPLICATION_JSON)
     public List<UserEntity> listAll(@Context SecurityContext context) {
         return userEntityDao.listAll();
     }
 
+    @PUT
+    @Path("/update/{email}")
+    @Transactional
+    @RolesAllowed("admin")
+    public Response update(@Context SecurityContext context, @PathParam("email") String email, @NotNull UserEntity userEntity) {
+        UserEntity user = userEntityDao.findByEmail(email);
+        if (user == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        if (user.role.equals("admin")) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+        user.cash = userEntity.cash;
+        user.role = userEntity.role;
+        user.transactions = userEntity.transactions;
+        user.stocks = userEntity.stocks;
+        return Response.ok(userEntityDao.update(user)).build();
+    }
+
+    @DELETE
+    @Path("/{email}")
+    @Transactional
+    @RolesAllowed("admin")
+    public Response delete(@Context SecurityContext context, @PathParam("email") String email) {
+        UserEntity user = userEntityDao.findByEmail(email);
+        if (user == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        if (user.role.equals("admin")) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+        userEntityDao.delete(user);
+        return Response.ok().build();
+    }
+
+    @DELETE
+    @Path("/delete-all")
+    @Transactional
+    @RolesAllowed("admin")
+    public Response deleteAll(@Context SecurityContext context) {
+        userEntityDao.deleteAllUsers();
+        return Response.ok().build();
+    }
+
     @GET
     @Path("/me")
-    public UserEntity listByUsername(@Context SecurityContext context) {
-        return userEntityDao.findByUsername(context.getUserPrincipal().getName());
+    public UserEntity getActiveUser(@Context SecurityContext context) {
+        return userEntityDao.findByEmail(context.getUserPrincipal().getName());
     }
 
     @GET
-    @Path("/quote")
-    public FinnhubQuote quote(@Context SecurityContext context, @QueryParam("symbol") String symbol) throws ExecutionException, InterruptedException {
-        FinnhubQuote quote = financialResourceClient.quote(symbol).toCompletableFuture().get();
-        quote.symbol = symbol;
-        return quote;
-    }
-
-    @GET
-    @Path("/username-available")
-    @PermitAll
-    public boolean isUsernameAvailable(@Context SecurityContext context, @QueryParam("username") String username) {
-        return userEntityDao.findByUsername(username) == null;
+    @Path("/{email}")
+    @RolesAllowed("admin")
+    public UserEntity listByUsername(@PathParam("email") String email) {
+        return userEntityDao.findByEmail(email);
     }
 
     @POST
     @Path("/create")
-    @Produces(MediaType.APPLICATION_JSON)
     @Transactional
     @PermitAll
-    public UserEntity createUser(@NotNull @QueryParam("username") String username, @NotNull @QueryParam("firstName") String firstName, @NotNull @QueryParam("lastName") String lastName, @NotNull @QueryParam("password") String password, @NotNull @QueryParam("email") String email) {
-        System.out.println("Creating user: " + username);
-        if (userEntityDao.findByUsername(username) != null) {
-            throw HttpProblem.builder()
-                    .withStatus(Response.Status.fromStatusCode(422))
-                    .withTitle("User Already Exists")
-                    .withDetail("A user with the username of " + username + " already exists in the system.")
-                    .withInstance(URI.create("/api/v1/users/create"))
-                    .build();
-        }
+    public UserEntity createUser(@NotNull @QueryParam("firstName") String firstName, @NotNull @QueryParam("lastName") String lastName, @NotNull @QueryParam("password") String password, @NotNull @QueryParam("email") String email) {
+        System.out.println("Creating user: " + email);
         if (userEntityDao.findByEmail(email) != null) {
             throw HttpProblem.builder()
                     .withStatus(Response.Status.fromStatusCode(422))
@@ -104,15 +129,7 @@ public class UserResource {
                     .withInstance(URI.create("/api/v1/users/create"))
                     .build();
         }
-        UserEntity entity = userEntityDao.create(username, firstName, lastName, email, password);
-        return entity;
-    }
-
-    @GET
-    @Path("/apikey")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String apikey(@Context SecurityContext context) {
-        return ConfigProvider.getConfig().getValue("ApiKeys.finnhubApiKey", String.class);
+        return userEntityDao.create(firstName, lastName, email, password);
     }
 
     @GET
@@ -122,73 +139,5 @@ public class UserResource {
         return userEntityDao.findByEmail(email) == null;
     }
 
-    @PUT
-    @Path("/transaction")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Transactional
-    public UserEntity appendTransaction(@Context SecurityContext securityContext, @NotNull @QueryParam("symbol") String symbol, @NotNull @QueryParam("amount") double amount, @NotNull @QueryParam("pricePu") double price, @NotNull @QueryParam("tradeType") TradeType tradeType) {
-        if (price <= 0) {
-            throw HttpProblem.builder()
-                    .withStatus(Response.Status.fromStatusCode(422))
-                    .withTitle("Invalid Price")
-                    .withDetail("The price per unit must be greater than 0.")
-                    .withInstance(URI.create("/api/v1/users/transaction"))
-                    .build();
-        }
-        if (!whitelistStockEntityDao.isWhitelisted(symbol)) {
-            throw HttpProblem.builder()
-                    .withStatus(Response.Status.fromStatusCode(422))
-                    .withTitle("Invalid Symbol")
-                    .withDetail("The symbol " + symbol + " is not whitelisted.")
-                    .withInstance(URI.create("/api/v1/users/transaction"))
-                    .build();
-        }
-        if (amount <= 0) {
-            throw HttpProblem.builder()
-                    .withStatus(Response.Status.fromStatusCode(422))
-                    .withTitle("Invalid Amount")
-                    .withDetail("The amount must be greater than 0.")
-                    .withInstance(URI.create("/api/v1/users/transaction"))
-                    .build();
-        }
-        StockEntity stockEntity = stockEntityDao.create(symbol, amount);
-        stockEntity.persist();
-        UserEntity userEntity = userEntityDao.findByUsername(securityContext.getUserPrincipal().getName());
-        List<StockEntity> userInv = userEntity.stocks;
-        StockEntity requestedStock = userInv.stream().filter((s -> Objects.equals(s.symbol, symbol))).findFirst().orElse(null);
-        if (tradeType == TradeType.BUY) {
-            if (userEntity.cash < amount * price) {
-                throw HttpProblem.builder()
-                        .withStatus(Response.Status.fromStatusCode(422))
-                        .withTitle("Insufficient Funds")
-                        .withDetail("You do not have enough cash to complete this transaction.")
-                        .withInstance(URI.create("/api/v1/users/transaction"))
-                        .build();
-            }
-            if (requestedStock == null) {
-                userInv.add(stockEntity);
-                requestedStock = stockEntity;
-            } else {
-                requestedStock.amount += amount;
-            }
-            userEntity.cash -= amount * price;
-        } else if (tradeType == TradeType.SELL) {
-            if (requestedStock == null || requestedStock.amount < amount) {
-                throw HttpProblem.builder()
-                        .withStatus(Response.Status.fromStatusCode(422))
-                        .withTitle("Insufficient Stock")
-                        .withDetail("You do not have enough stock to complete this transaction.")
-                        .withInstance(URI.create("/api/v1/users/transaction"))
-                        .build();
-            }
-            requestedStock.amount -= amount;
-            if (requestedStock.amount == 0) {
-                userEntity.stocks.remove(requestedStock);
-            }
-            userEntity.cash += amount * price;
-        }
-        TransactionHistoryEntity transactionEntity = transactionHistoryDao.create(stockEntity, price, tradeType);
-        userEntity = userEntityDao.appendTransaction(userEntity, transactionEntity);
-        return userEntity;
-    }
+
 }

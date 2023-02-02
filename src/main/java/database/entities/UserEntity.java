@@ -1,5 +1,6 @@
 package database.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkus.security.User;
 import io.quarkus.security.jpa.Password;
@@ -16,13 +17,12 @@ import java.util.List;
 @Entity
 public class UserEntity extends PanacheEntity {
 
-    @Username
-    public String username;
-
     @Password
+    @JsonIgnore
     public String password;
 
     @Email
+    @Username
     public String email;
 
     @Roles

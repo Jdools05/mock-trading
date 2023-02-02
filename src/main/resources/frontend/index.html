@@ -9,6 +9,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
             crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -17,18 +19,28 @@
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <a class="navbar-brand" href="#">Mock Trading</a>
+        <a class="navbar-brand" href="/home">Mock Trading</a>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="#">Home</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="/whitelist">Whitelist</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="/instructions">Instructions</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="mailto:jordan.dooley@k12.nd.us">Contact Me</a>
+                </li>
+                <li class="nav-item d-none" id="admin-link">
+                    <a class="nav-link" href="/admin">Admin</a>
+                </li>
             </ul>
         </div>
         <ul class="navbar-nav mb-2 mb-lg-0">
-            <li class="navbar-brand" id="user-username">NAME</li>
+            <li class="navbar-brand" id="user-name">NAME</li>
             <li class="navbar-brand text-success" id="user-balance">$50,000</li>
             <li>
                 <button class="btn btn-outline-success" type="submit" onclick="logout()">Logout</button>
@@ -36,95 +48,135 @@
         </ul>
     </div>
 </nav>
-<div class="container text-container">
+<div class="container text-container mt-2">
     <div class="row justify-content-between">
-        <div class="col-4 text-center card border-success">
+        <div class="col-12 col-xl-5 text-center card border-success">
             <div class="card-header">
                 <h4>Stock Inventory</h4>
             </div>
             <div class="card-body">
-                <table class="table table-striped table-hover">
-                    <thead>
-                    <tr>
-                        <th scope="col">Stock</th>
-                        <th scope="col">Amount</th>
-                        <th scope="col">Net Value</th>
-                    </tr>
-                    </thead>
-                    <tbody id="stock-table">
-                    <tr>
-                        <td>Example 1</td>
-                        <td>10</td>
-                        <td>$100</td>
-                    </tr>
-                    <tr>
-                        <td>Example 2</td>
-                        <td>20</td>
-                        <td>$200</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="col">
-            <div class="col text-center card border-info">
-                <div class="card-header">
-                    <h4>Stock Lookup</h4>
-                </div>
-                <div class="card-body">
+                <div class="table-responsive">
                     <table class="table table-striped table-hover">
                         <thead>
                         <tr>
-                            <th scope="col">Symbol</th>
-                            <th scope="col">Price</th>
-                            <th scope="col">Change</th>
-                            <th scope="col">Percent Change</th>
-                            <th scope="col">High</th>
-                            <th scope="col">Low</th>
-                            <th scope="col">Open</th>
-                            <th scope="col">Previous Close</th>
+                            <th scope="col">Stock</th>
+                            <th scope="col">Amount</th>
+                            <th scope="col">Current Value</th>
+                            <th scope="col">Net Gain/Loss</th>
                         </tr>
                         </thead>
-                        <tbody id="stock-lookup">
+                        <tbody id="stock-table">
                         <tr>
-                            <td>Example</td>
-                            <td>$100</td>
-                            <td>$10</td>
-                            <td>10%</td>
-                            <td>$110</td>
-                            <td>$90</td>
-                            <td>$105</td>
-                            <td>$90</td>
+                            <td colspan="4">
+                                <div class="spinner-border text-warning" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
                     </table>
-                    <div class="d-flex">
-                        <button class="btn btn-outline-success me-2" type="submit" onclick="updateStockDisplay()">
-                            Search
-                        </button>
-                        <input class="form-control" id="stock-input" type="search" placeholder="AAPL"
-                               aria-label="Search"/>
+                </div>
+            </div>
+            <!--            <button class="btn btn-info mb-2" onclick="copyTableEntryToClipboard()">Copy entry for stock charting-->
+            <!--            </button>-->
+        </div>
+        <div class="col p-0">
+            <div class="container">
+                <div class="row">
+                    <div class="col text-center card border-info">
+                        <div class="card-header">
+                            <h4>Stock Lookup</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover table-responsive">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">Symbol</th>
+                                        <th scope="col">Price</th>
+                                        <th scope="col">Change</th>
+                                        <th scope="col">Percent Change</th>
+                                        <th scope="col">High</th>
+                                        <th scope="col">Low</th>
+                                        <th scope="col">Open</th>
+                                        <th scope="col">Previous Close</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="stock-lookup">
+                                    <tr>
+                                        <td>Example</td>
+                                        <td>$100.00</td>
+                                        <td>$10.00</td>
+                                        <td>10%</td>
+                                        <td>$110.00</td>
+                                        <td>$90.00</td>
+                                        <td>$105.00</td>
+                                        <td>$90.00</td>
+                                </table>
+                            </div>
+                            <div class="d-flex">
+                                <button class="btn btn-outline-success me-2" type="submit"
+                                        onclick="updateStockDisplay()">
+                                    Search
+                                </button>
+                                <input class="form-control" id="stock-input" type="search" placeholder="AAPL"
+                                       aria-label="Search"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col text-white card border-warning">
+                        <div class="card-header">
+                            <h4 class="text-center">Transaction Form</h4>
+                        </div>
+                        <div class="card-body">
+                            Do you want to buy or sell?
+                            <select class="form-select" id="transaction-type" aria-label="Default select example">
+                                <option selected value="BUY">Buy</option>
+                                <option value="SELL">Sell</option>
+                            </select>
+                            How many shares?
+                            <div class="input-group mb-3">
+                                <input type="number" id="transaction-quantity" class="form-control" value="1"
+                                       min="1"
+                                       step="1"
+                                       aria-label="Username" aria-describedby="basic-addon1">
+                                <button class="btn btn-outline-success" type="submit" onclick="createTransaction()">
+                                    Create
+                                    Transaction
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col text-white card border-warning">
-                <div class="card-header">
-                    <h4 class="text-center">Transaction Form</h4>
-                </div>
-                <div class="card-body">
-                    Do you want to buy or sell?
-                    <select class="form-select" id="transaction-type" aria-label="Default select example">
-                        <option selected value="BUY">Buy</option>
-                        <option value="SELL">Sell</option>
-                    </select>
-                    How many shares?
-                    <div class="input-group mb-3">
-                        <input type="number" id="transaction-quantity" class="form-control" value="1"
-                               min="1"
-                               step="1"
-                               aria-label="Username" aria-describedby="basic-addon1">
-                        <button class="btn btn-outline-success" type="submit" onclick="createTransaction()">Create
-                            Transaction
-                        </button>
-                    </div>
+        </div>
+    </div>
+    <div id="alert-container"></div>
+    <div class="row justify-content-center my-2">
+        <div class="card border-dark col-12" style="min-height: 600px;" id="stock-candle-container">
+            <div class="card-body">
+                <div class="tradingview-widget-container" style="height: 100%;">
+                    <div id="tradingview_c1b01" style="height: 100%;"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+                    <script type="text/javascript">
+                        new TradingView.widget(
+                            {
+                                "autosize": true,
+                                "symbol": "NASDAQ:AAPL",
+                                "interval": "D",
+                                "timezone": "Etc/UTC",
+                                "theme": "dark",
+                                "style": "1",
+                                "locale": "en",
+                                "toolbar_bg": "#f1f3f6",
+                                "enable_publishing": false,
+                                "allow_symbol_change": true,
+                                "container_id": "tradingview_c1b01"
+                            }
+                        );
+                    </script>
                 </div>
             </div>
         </div>
@@ -133,25 +185,43 @@
 <script>
     window.onload = function () {
         getUserStockInventory();
-        pushAlert(infoAlert)
+        pushAlert(infoAlert);
     };
+
+    const moneyFormatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        maximumFractionDigits: 2
+    });
+
+    function handleRequest(method, url, body, callback) {
+        let xhr = new XMLHttpRequest();
+        xhr.open(method, url);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    callback(xhr.responseText);
+                } else if (xhr.status === 401 || xhr.status === 403) {
+                    window.location.href = "/login";
+                } else {
+                    pushAlert(detailedError(xhr.responseText));
+                }
+            }
+        };
+        xhr.send(body);
+    }
 
     class User {
 
         constructor(json) {
-            this.username = json.username;
             this.firstName = json.firstName;
             this.lastName = json.lastName;
             this.email = json.email;
-            this.password = json.password;
             this.cash = json.cash;
             this.role = json.role;
             this.transactions = json.transactions;
             this.stockInventory = json.stocks;
-        }
-
-        getStockInventory() {
-            return this.stockInventory;
         }
     }
 
@@ -162,17 +232,32 @@
 
     const infoAlert = "<div class=\"row alert alert-dismissible alert-info fade show\" role=\"alert\">\n" +
         "        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button>\n" +
-        "        <strong>New Feature!</strong> You can click on the stocks in your inventory! This will automatically look up the current stock price and calculate value of your current holdings!" +
+        "        <strong>Welcome!</strong> This is the main page to manage your stocks and create transactions!\n" +
+        "        Note that the financial data between the stock lookup and the candlestick chart may be different due to discrepancies in the time of recording." +
         "    </div>";
 
     const successAlert = "<div class=\"row alert alert-dismissible alert-success fade show\" role=\"alert\">\n" +
         "        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button>\n" +
         "        <strong>Transaction Created!</strong> Transaction has been created and stored in the database." +
         "    </div>";
+    const copySuccessAlert = "<div class='row alert alert-dismissible alert-success fade show' role='alert'>\n" +
+        "        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>\n" +
+        "        <strong>Table Entry Copied!</strong> The table entry has been copied to your clipboard." +
+        "    </div>";
+
     const errorAlert = "<div class=\"row alert alert-dismissible alert-danger fade show\" role=\"alert\">\n" +
         "        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button>\n" +
         "        <strong>Transaction Failed!</strong> Transaction failed to be created. Please check your inputs and try again." +
         "    </div>";
+
+    function detailedError(response) {
+        let status = JSON.parse(response).status;
+        let message = JSON.parse(response).detail;
+        return "<div class=\"row alert alert-dismissible alert-danger fade show\" role=\"alert\">\n" +
+            "        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button>\n" +
+            "        <strong>Status " + status + "</strong>" + message +
+            "    </div>";
+    }
 
     function pushAlert(template) {
         const alert = document.createElement('div');
@@ -182,7 +267,7 @@
         if (document.getElementById("alert-div") != null) {
             document.getElementById("alert-div").remove();
         }
-        document.querySelector('.text-container').appendChild(alert);
+        document.getElementById("alert-container").appendChild(alert);
     }
 
     function createTransaction() {
@@ -193,88 +278,129 @@
             alert('Please enter a symbol and quantity');
             return;
         }
-        let Httpquote = new XMLHttpRequest();
-        let urlquote = window.location.origin + '/api/v1/users/quote?symbol=' + symbol;
-        Httpquote.open("GET", urlquote);
-        Httpquote.send();
 
-        Httpquote.onreadystatechange = (e) => {
-            if (Httpquote.readyState === 4 && Httpquote.status === 200) {
-                let quote = JSON.parse(Httpquote.responseText);
-                let price = quote.cost;
-                if (!confirm('Are you sure you want to ' + type + ' ' + quantity + ' shares of ' + symbol + ' for $' + price + ' per share?')) {
-                    return;
-                }
-                let Http = new XMLHttpRequest();
-                let url = window.location.origin + '/api/v1/users/transaction?symbol=' + symbol + '&amount=' + quantity + '&pricePu=' + price + '&tradeType=' + type;
-                Http.open("PUT", url);
-                Http.send();
-                Http.onreadystatechange = (e) => {
-                    if (Http.readyState === 4 && Http.status === 200) {
-                        pushAlert(successAlert);
-                        getUserStockInventory();
-                    } else if (Http.readyState === 4 && Http.status === 400) {
-                        pushAlert(errorAlert);
-                    }
-                }
-            } else if (Httpquote.readyState === 4 && (Httpquote.status === 422 || Httpquote.status === 500 || Httpquote.status === 400)) {
-                pushAlert(errorAlert);
+        let urlquote = window.location.origin + "/api/v1/stocks/quote?symbol=" + symbol;
+        handleRequest('GET', urlquote, null, function (data) {
+            let quote = JSON.parse(data);
+            let price = quote.cost;
+            if (!confirm('Are you sure you want to ' + type + ' ' + quantity + ' shares of ' + symbol + ' for ' + moneyFormatter.format(price) + ' per share?')) {
+                return;
             }
-        }
-
+            let url = window.location.origin + '/api/v1/stocks/transaction?symbol=' + symbol + '&amount=' + quantity + '&pricePu=' + price + '&tradeType=' + type;
+            handleRequest('POST', url, null, function (data) {
+                pushAlert(successAlert);
+                getUserStockInventory();
+            });
+        });
     }
 
-    function updateStockDisplay(amount = 0) {
+    function updateStockDisplay(amount = 0, throughInv = false, net = 0) {
         let symbol = document.getElementById('stock-input').value.toUpperCase();
-        let Http = new XMLHttpRequest();
-        let url = window.location.origin + "/api/v1/users/quote?symbol=" + symbol
-        Http.open("GET", url);
-        Http.send();
-
-        Http.onreadystatechange = (e) => {
-            if (Http.status === 200) {
-                let data = JSON.parse(Http.responseText);
-                if (data.cost != null) {
-                    let tr = document.createElement('tr');
-                    tr.innerHTML = "<td>" + data.symbol + "</td><td>" + "$" + data.cost.toLocaleString('en-US') + "</td><td id='stock-change'>" + "$" + data.change.toLocaleString('en-US') + "</td><td id='stock-percent-change'>" + data.percentChange.toString() + "%</td><td>" + "$" + data.high.toLocaleString('en-US') + "</td><td>" + "$" + data.low.toLocaleString('en-US') + "</td><td>" + "$" + data.dayOpen.toLocaleString('en-US') + "</td><td>" + "$" + data.previousClose.toLocaleString('en-US') + "</td>";
-                    document.getElementById("stock-lookup").innerHTML = "";
-                    document.getElementById("stock-lookup").appendChild(tr);
-                    let color = data.change > 0 ? "limegreen" : "red";
-                    document.getElementById('stock-change').style.color = color;
-                    document.getElementById('stock-percent-change').style.color = color;
-                    document.getElementById(data.symbol + "-net").textContent = "$" + (data.cost * amount).toLocaleString('en-US');
+        let url = window.location.origin + "/api/v1/stocks/quote?symbol=" + symbol
+        if (symbol === '') {
+            alert('Please enter a symbol');
+            return;
+        }
+        handleRequest('GET', url, null, function (data) {
+            let quote = JSON.parse(data);
+            if (quote.cost != null) {
+                let tr = document.createElement('tr');
+                tr.innerHTML = "<td>" + quote.symbol + "</td><td>" + moneyFormatter.format(quote.cost) + "</td><td id='stock-change'>" + moneyFormatter.format(quote.change) + "</td><td id='stock-percent-change'>" + quote.percentChange.toString() + "%</td><td>" + moneyFormatter.format(quote.high) + "</td><td>" + moneyFormatter.format(quote.low) + "</td><td>" + moneyFormatter.format(quote.dayOpen) + "</td><td>" + moneyFormatter.format(quote.previousClose) + "</td>";
+                document.getElementById("stock-lookup").innerHTML = "";
+                document.getElementById("stock-lookup").appendChild(tr);
+                let color = quote.change > 0 ? "limegreen" : "red";
+                document.getElementById('stock-change').style.color = color;
+                document.getElementById('stock-percent-change').style.color = color;
+                if (throughInv) document.getElementById(quote.symbol + "-current").textContent = moneyFormatter.format(quote.cost * amount);
+                if (throughInv) {
+                    document.getElementById(quote.symbol + "-net").textContent = moneyFormatter.format(net + (quote.cost * amount));
+                    document.getElementById(quote.symbol + "-net").style.color = net + (quote.cost * amount) > 0 ? "limegreen" : "red";
                 }
             }
-        }
+        });
     }
 
     function getUserStockInventory() {
-        let Http = new XMLHttpRequest();
         let url = window.location.origin + '/api/v1/users/me';
-        Http.open("GET", url);
-        Http.send();
+        handleRequest('GET', url, null, function (data) {
+            let user = new User(JSON.parse(data));
 
-        Http.onreadystatechange = (e) => {
-            if (Http.readyState === 4 && Http.status === 200) {
-                let user = new User(JSON.parse(Http.responseText));
-                document.getElementById("user-balance").innerHTML = "$" + user.cash.toLocaleString('en-US');
-                document.getElementById("user-username").innerHTML = user.firstName;
-                let stockInventory = user.getStockInventory();
-                let stockTable = document.getElementById("stock-table");
-                stockTable.innerHTML = "";
-                for (let i = 0; i < stockInventory.length; i++) {
-                    let stock = stockInventory[i];
-                    let tr = document.createElement('tr');
-
-                    tr.onclick = function () {
-                        document.getElementById('stock-input').value = stock.symbol;
-                        updateStockDisplay(stock.amount);
-                    }
-                    tr.innerHTML = "<td>" + stock.symbol + "</td><td>" + stock.amount + "</td><td id=\'" + stock.symbol + "-net" + "\'>$0</td>";
-                    stockTable.appendChild(tr);
-                }
+            if (user.role === "admin") {
+                document.getElementById("admin-link").classList.remove("d-none");
             }
+
+            let inventory = user.stockInventory;
+            let table = document.getElementById("stock-table");
+            table.innerHTML = "";
+            let name = document.getElementById("user-name");
+            name.textContent = user.firstName
+            let cash = document.getElementById("user-balance");
+            cash.textContent = moneyFormatter.format(user.cash);
+            if (inventory.length === 0) {
+                document.getElementById("stock-table").innerHTML = "<tr><td colspan='4'>No stocks owned</td></tr>";
+            }
+            for (let i = 0; i < inventory.length; i++) {
+                let tr = document.createElement('tr');
+                tr.innerHTML = "<td>" + inventory[i].symbol + "</td><td>" + inventory[i].amount + "</td><td id='" + inventory[i].symbol + "-current'>" + (inventory[i].costPer * inventory[i].amount).toLocaleString('en-US') + "</td><td id='" + inventory[i].symbol + "-net'>$0.00</td>";
+                table.appendChild(tr);
+                tr.addEventListener('click', function () {
+                    document.getElementById('stock-input').value = inventory[i].symbol;
+                    // sum up the transaction history to find net gain/loss
+                    let transactions = user.transactions;
+                    let net = 0;
+                    for (let j = 0; j < transactions.length; j++) {
+                        if (transactions[j].stockSymbol === inventory[i].symbol) {
+                            net += transactions[j].stockAmount * transactions[j].price * (transactions[j].tradeType === "BUY" ? -1 : 1);
+                        }
+                    }
+                    // pass it into the update display function
+                    updateStockDisplay(inventory[i].amount, true, net);
+
+                });
+                let gross = inventory[i].costPer * inventory[i].amount;
+                if (isNaN(gross)) {
+                    gross = 0;
+                }
+                document.getElementById(inventory[i].symbol + '-current').textContent = moneyFormatter.format(gross);
+            }
+        });
+
+    }
+
+    function copyTableEntryToClipboard() {
+        let symbol = document.getElementById('stock-input').value.toUpperCase();
+        let url = window.location.origin + "/api/v1/stocks/quote?symbol=" + symbol
+        if (symbol === '') {
+            alert('Please enter a symbol');
+            return;
         }
+        handleRequest('GET', url, null, function (data) {
+            let quote = JSON.parse(data);
+            if (quote.cost != null) {
+                handleRequest('GET', window.location.origin + "/api/v1/users/me", null, function (userData) {
+                    let user = new User(JSON.parse(userData));
+                    let inventory = user.stockInventory;
+                    let amount = 0;
+                    for (let i = 0; i < inventory.length; i++) {
+                        if (inventory[i].symbol === symbol) {
+                            amount = inventory[i].amount;
+                            break;
+                        }
+                    }
+                    let gross = quote.cost * amount;
+                    if (isNaN(gross)) {
+                        gross = 0;
+                    }
+                    let date = new Date();
+                    let dateString = date.getMonth() + 1 + "-" + date.getDate() + "-" + date.getFullYear();
+                    let net = document.getElementById(symbol + "-net").textContent;
+                    // format string as date, price, amount, gross, net
+                    let clipboardString = "\n" + dateString + " \n\n" + moneyFormatter.format(quote.cost) + " \n\n" + amount + " \n\n" + moneyFormatter.format(gross) + " \n\n" + net + " \n\n";
+                    navigator.clipboard.writeText(clipboardString);
+                    pushAlert(copySuccessAlert);
+                });
+            }
+        });
     }
 </script>
 </body>

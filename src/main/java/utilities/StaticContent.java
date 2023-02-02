@@ -1,3 +1,5 @@
+package utilities;
+
 import io.quarkus.vertx.web.Route;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.FileSystemAccess;
@@ -21,11 +23,36 @@ public class StaticContent {
         StaticHandler.create(FileSystemAccess.RELATIVE, "frontend/login.html").handle(rc);
     }
 
+    @Route(path = "/whitelist", methods = Route.HttpMethod.GET)
+    void whitelistContent(RoutingContext rc) {
+        StaticHandler.create(FileSystemAccess.RELATIVE, "frontend/whitelist.html").handle(rc);
+    }
+
     @RolesAllowed("admin")
     @Route(path = "/admin", methods = Route.HttpMethod.GET)
     void adminContent(RoutingContext rc) {
         StaticHandler.create(FileSystemAccess.RELATIVE, "frontend/admin.html").handle(rc);
     }
+
+    @PermitAll
+    @Route(path = "/reset-password", methods = Route.HttpMethod.GET)
+    void resetPasswordContent(RoutingContext rc) {
+        StaticHandler.create(FileSystemAccess.RELATIVE, "frontend/reset-password.html").handle(rc);
+    }
+
+    @PermitAll
+    @Route(path = "/request-password-reset", methods = Route.HttpMethod.GET)
+    void requestPasswordResetContent(RoutingContext rc) {
+        StaticHandler.create(FileSystemAccess.RELATIVE, "frontend/request-password-reset.html").handle(rc);
+    }
+
+    @RolesAllowed({"user", "admin"})
+    @Route(path = "/instructions", methods = Route.HttpMethod.GET)
+    void instructionsContent(RoutingContext rc) {
+        StaticHandler.create(FileSystemAccess.RELATIVE, "frontend/instructions.html").handle(rc);
+    }
+
+
 
 //    @PermitAll
 //    @Route(path = "/test", methods = Route.HttpMethod.GET)
@@ -39,9 +66,10 @@ public class StaticContent {
         StaticHandler.create(FileSystemAccess.RELATIVE, "META-INF/bootstrap.min.css").handle(rc);
     }
 
-    @Route(path = "/error", methods = Route.HttpMethod.GET)
-    void errorContent(RoutingContext rc) {
-        StaticHandler.create(FileSystemAccess.RELATIVE, "frontend/error.html").handle(rc);
+    @PermitAll
+    @Route(path = "/favicon.ico", methods = Route.HttpMethod.GET)
+    void faviconContent(RoutingContext rc) {
+        StaticHandler.create(FileSystemAccess.RELATIVE, "META-INF/favicon.ico").handle(rc);
     }
 
     @Route(path = "/register", methods = Route.HttpMethod.GET)
