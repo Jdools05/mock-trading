@@ -53,7 +53,7 @@ public class WhitelistResource {
         return stockRequestDao.getAllStockRequests();
     }
 
-    @PUT
+    @POST
     @Path("/approve/{id}")
     @Transactional
     public Response approve(@PathParam("id") Long id) {

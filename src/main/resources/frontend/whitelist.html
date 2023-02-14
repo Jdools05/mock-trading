@@ -220,7 +220,7 @@
     }
 
     function acceptRequest(id) {
-        handleRequest("PUT", "/api/v1/whitelist/approve/" + id, null, function (response) {
+        handleRequest("POST", "/api/v1/whitelist/approve/" + id, null, function (response) {
             getRequestList();
             successAlert("Request Accepted");
             refreshWhitelist();
