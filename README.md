@@ -4,9 +4,9 @@
 
 These screenshots show examples of what the frontend looks like. Note that non-admin users will not be able to see some tabs or containers.
 
-![Screenshot of home page](https://github.com/Jdools05/mock-trading/tree/master/src/main/resources/META-INF/resources/images/home-page.png?raw=true)
-![Screenshot of whitelist page](https://github.com/Jdools05/mock-trading/tree/master/src/main/resources/META-INF/resources/images/whitelist-page.png?raw=true)
-![Screenshot of instruction page](https://github.com/Jdools05/mock-trading/tree/master/src/main/resources/META-INF/resources/images/instruction-page.png?raw=true)
+![Screenshot of home page](./src/main/resources/META-INF/resources/images/home-page.png)
+![Screenshot of whitelist page](./src/main/resources/META-INF/resources/images/whitelist-page.png)
+![Screenshot of instruction page](./src/main/resources/META-INF/resources/images/instruction-page.png)
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
